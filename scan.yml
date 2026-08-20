@@ -2,9 +2,11 @@ name: Forex Signal Scan
 
 on:
   schedule:
-    # Every 15 minutes. GitHub may delay slightly under load — this is normal.
     - cron: "*/15 * * * *"
-  workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # needed so the workflow can save trades_state.json back to the repo
 
 jobs:
   scan:
@@ -27,3 +29,11 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python scanner.py
+
+      - name: Save trade state
+        run: |
+          git config user.name "forex-scanner-bot"
+          git config user.email "actions@github.com"
+          git add trades_state.json
+          git diff --staged --quiet || git commit -m "Update trade state [skip ci]"
+          git push
