@@ -1,22 +1,22 @@
 """
-Forex + Gold signal scanner with trade tracking -> Telegram alerts.
+Forex + Gold signal scanner with trade tracking, auto win-rate stats,
+and quiet messaging -> Telegram alerts.
 
-This version REMEMBERS open trades between runs (state saved to
-trades_state.json, committed back to the repo by the workflow) and:
-
-  - Opens a new trade only on full 3/3 indicator agreement (trend + RSI +
-    MACD all aligned) -- higher conviction, fewer but stronger signals.
-  - Tags each new trade as Scalp or Swing based on how large the target
-    move is relative to price.
-  - Every run, re-checks each OPEN trade's most recent candle against its
-    levels:
-      * TP1 hit  -> tells you to bank partial profit and move stop to
-        breakeven, keeps the trade open (now risk-free) targeting TP2.
-      * TP2 hit  -> full target reached, closes the trade.
-      * SL hit (before TP1)   -> stopped out for a loss, closes the trade.
-      * Breakeven hit (after TP1) -> closed flat, no loss, no further gain.
-  - Only opens ONE trade per pair at a time (won't stack conflicting
-    signals on the same pair).
+Behavior:
+  - Opens a trade only on full 3/3 indicator agreement (trend + RSI + MACD).
+  - Tags each trade Scalp or Swing based on target size relative to price.
+  - Every run, re-checks open trades' latest candle against levels:
+      TP1 hit -> partial profit + move stop to breakeven (trade stays open)
+      TP2 hit -> full win, closed
+      SL hit (before TP1) -> loss, closed
+      Breakeven hit (after TP1) -> closed flat, partial gain already banked
+  - Every closed trade is logged to history with an approximate R result:
+      TP2 = +2R, SL = -1R, breakeven-after-TP1 = +0.5R (assumes half
+      position closed at TP1, remainder stopped at breakeven).
+  - Once every 24h, sends a summary: trades closed, win rate, total R.
+  - QUIET MODE: if nothing happened this cycle (no update, no new signal,
+    no summary due), no Telegram message is sent at all -- only real
+    changes reach you.
 
 Required environment variables (GitHub Actions secrets):
   TWELVE_DATA_API_KEY
@@ -28,6 +28,7 @@ import os
 import sys
 import time
 import json
+import datetime
 import requests
 
 PAIRS = [
@@ -46,7 +47,11 @@ REQUEST_GAP_SECONDS = 7
 ATR_STOP_MULTIPLIER = 1.5
 RR_TP1 = 1.0
 RR_TP2 = 2.0
-SCALP_PCT_THRESHOLD = 0.4  # TP2 distance as % of price; below = scalp, above = swing
+SCALP_PCT_THRESHOLD = 0.4
+
+R_TP2 = 2.0
+R_SL = -1.0
+R_BREAKEVEN_AFTER_TP1 = 0.5  # approximation: half position banked at TP1
 
 
 # ---------- indicators (oldest -> newest order) ----------
@@ -172,7 +177,6 @@ def build_signal(highs, lows, closes):
     else:
         notes.append("MACD: insufficient data")
 
-    # Full-agreement filter: require all 3 indicators aligned (score == 3 or -3)
     direction = None
     if score == 3:
         direction = "buy"
@@ -236,10 +240,14 @@ def load_state():
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                data.setdefault("trades", {})
+                data.setdefault("closed", [])
+                data.setdefault("last_summary_date", None)
+                return data
         except Exception:
-            return {"trades": {}}
-    return {"trades": {}}
+            pass
+    return {"trades": {}, "closed": [], "last_summary_date": None}
 
 
 def save_state(state):
@@ -248,7 +256,6 @@ def save_state(state):
 
 
 def check_open_trade(trade, highs, lows, closes, d):
-    """Check the latest candle against this trade's levels. Returns (status_msg or None, updated_trade, still_open)."""
     last_high, last_low = highs[-1], lows[-1]
     direction = trade["direction"]
     entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
@@ -256,46 +263,55 @@ def check_open_trade(trade, highs, lows, closes, d):
 
     if not trade.get("tp1_hit"):
         if direction == "buy":
-            hit_tp1 = last_high >= tp1
-            hit_sl = last_low <= sl
+            hit_tp1, hit_sl = last_high >= tp1, last_low <= sl
         else:
-            hit_tp1 = last_low <= tp1
-            hit_sl = last_high >= sl
+            hit_tp1, hit_sl = last_low <= tp1, last_high >= sl
 
         if hit_sl:
             msg = (f"🔴 <b>{pair_label}</b> — SL hit\n"
-                   f"Trade closed at <code>{sl:.{d}f}</code> — stop-loss triggered.\n"
-                   f"<i>Result: loss (-1R)</i>")
-            return msg, trade, False
+                   f"Closed at <code>{sl:.{d}f}</code>. <i>Result: -1R</i>")
+            return msg, trade, False, ("sl", R_SL)
         if hit_tp1:
             trade["tp1_hit"] = True
-            trade["effective_sl"] = entry  # move to breakeven
-            msg = (f"🟡 <b>{pair_label}</b> — TP1 hit!\n"
-                   f"Price reached <code>{tp1:.{d}f}</code>.\n"
-                   f"👉 Suggest: bank partial profit here, move stop to breakeven (<code>{entry:.{d}f}</code>).\n"
-                   f"Holding remainder for TP2 at <code>{tp2:.{d}f}</code>.")
-            return msg, trade, True
-        return None, trade, True
+            trade["effective_sl"] = entry
+            msg = (f"🟡 <b>{pair_label}</b> — TP1 hit\n"
+                   f"Bank partial profit, move stop to breakeven (<code>{entry:.{d}f}</code>). "
+                   f"Holding rest for TP2 <code>{tp2:.{d}f}</code>.")
+            return msg, trade, True, None
+        return None, trade, True, None
     else:
         effective_sl = trade.get("effective_sl", entry)
         if direction == "buy":
-            hit_tp2 = last_high >= tp2
-            hit_be = last_low <= effective_sl
+            hit_tp2, hit_be = last_high >= tp2, last_low <= effective_sl
         else:
-            hit_tp2 = last_low <= tp2
-            hit_be = last_high >= effective_sl
+            hit_tp2, hit_be = last_low <= tp2, last_high >= effective_sl
 
         if hit_tp2:
-            msg = (f"🟢🟢 <b>{pair_label}</b> — TP2 hit! Full target reached\n"
-                   f"Closed at <code>{tp2:.{d}f}</code>.\n"
-                   f"<i>Result: win (+2R)</i>")
-            return msg, trade, False
+            msg = (f"🟢🟢 <b>{pair_label}</b> — TP2 hit! Full target\n"
+                   f"Closed at <code>{tp2:.{d}f}</code>. <i>Result: +2R</i>")
+            return msg, trade, False, ("tp2", R_TP2)
         if hit_be:
-            msg = (f"⚪ <b>{pair_label}</b> — Stopped at breakeven\n"
-                   f"Price came back to entry <code>{entry:.{d}f}</code> after TP1.\n"
-                   f"<i>Result: flat (0R) — TP1 partial gain already banked</i>")
-            return msg, trade, False
-        return None, trade, True
+            msg = (f"⚪ <b>{pair_label}</b> — Breakeven\n"
+                   f"Closed flat at entry. <i>Result: +0.5R (TP1 already banked)</i>")
+            return msg, trade, False, ("breakeven", R_BREAKEVEN_AFTER_TP1)
+        return None, trade, True, None
+
+
+def build_summary(closed_trades):
+    if not closed_trades:
+        return None
+    wins = [t for t in closed_trades if t["result"] in ("tp2", "breakeven")]
+    losses = [t for t in closed_trades if t["result"] == "sl"]
+    total_r = sum(t["r"] for t in closed_trades)
+    win_rate = (len(wins) / len(closed_trades)) * 100 if closed_trades else 0
+    return (
+        f"<b>📈 24h Summary</b>\n\n"
+        f"Trades closed: {len(closed_trades)}\n"
+        f"Wins: {len(wins)}  ·  Losses: {len(losses)}\n"
+        f"Win rate: {win_rate:.0f}%\n"
+        f"Total R: {'+' if total_r >= 0 else ''}{total_r:.2f}\n\n"
+        f"<i>Breakeven-after-TP1 counted as +0.5R (assumes half position banked at TP1).</i>"
+    )
 
 
 def main():
@@ -304,11 +320,12 @@ def main():
     tg_chat = os.environ["TELEGRAM_CHAT_ID"]
 
     state = load_state()
-    trades = state.get("trades", {})
+    trades = state["trades"]
+    closed_history = state["closed"]
 
     update_blocks = []
     new_signal_blocks = []
-    quiet_lines = []
+    newly_closed = []
 
     for symbol, label in PAIRS:
         try:
@@ -316,14 +333,22 @@ def main():
             d = decimals_for(symbol)
 
             if symbol in trades:
-                msg, updated_trade, still_open = check_open_trade(trades[symbol], highs, lows, closes, d)
+                msg, updated_trade, still_open, result = check_open_trade(trades[symbol], highs, lows, closes, d)
                 if msg:
                     update_blocks.append(msg)
                 if still_open:
                     trades[symbol] = updated_trade
-                else:
+                elif result:
+                    result_type, r_value = result
+                    record = {
+                        "pair": label, "direction": updated_trade["direction"],
+                        "trade_type": updated_trade.get("trade_type"),
+                        "result": result_type, "r": r_value,
+                        "closed_at": int(time.time()),
+                    }
+                    closed_history.append(record)
+                    newly_closed.append(record)
                     del trades[symbol]
-                    quiet_lines.append(f"{label}: trade closed, now flat")
             else:
                 sig = build_signal(highs, lows, closes)
                 if sig["direction"] and sig["plan"]:
@@ -347,13 +372,21 @@ def main():
                         f"<i>Full agreement: {' · '.join(sig['notes'])}</i>"
                     )
                     new_signal_blocks.append(block)
-                else:
-                    quiet_lines.append(f"{label}: no full-agreement setup")
         except Exception as e:
-            quiet_lines.append(f"⚠️ {label}: error — {e}")
+            print(f"Error on {label}: {e}", file=sys.stderr)
         time.sleep(REQUEST_GAP_SECONDS)
 
+    # daily summary check (once per UTC day)
+    today = datetime.date.today().isoformat()
+    summary_block = None
+    if state.get("last_summary_date") != today:
+        cutoff = int(time.time()) - 86400
+        recent_closed = [t for t in closed_history if t["closed_at"] >= cutoff]
+        summary_block = build_summary(recent_closed)
+        state["last_summary_date"] = today
+
     state["trades"] = trades
+    state["closed"] = closed_history
     save_state(state)
 
     parts = []
@@ -361,18 +394,15 @@ def main():
         parts.append("<b>📌 Trade Updates</b>\n\n" + "\n\n".join(update_blocks))
     if new_signal_blocks:
         parts.append("<b>🎯 New High-Conviction Setups</b>\n\n" + "\n\n".join(new_signal_blocks))
+    if summary_block:
+        parts.append(summary_block)
 
     if parts:
         message = "\n\n---\n\n".join(parts)
-        if quiet_lines:
-            message += "\n\n<i>" + "; ".join(quiet_lines) + "</i>"
+        send_telegram(tg_token, tg_chat, message)
+        print(message)
     else:
-        open_count = len(trades)
-        message = (f"<b>📊 Forex &amp; Gold Scan</b>\n\nNo new setups or level hits this cycle.\n"
-                    f"Open trades being tracked: {open_count}\n\n" + "\n".join(quiet_lines))
-
-    send_telegram(tg_token, tg_chat, message)
-    print(message)
+        print("Nothing to report this cycle — no message sent.")
 
 
 if __name__ == "__main__":
