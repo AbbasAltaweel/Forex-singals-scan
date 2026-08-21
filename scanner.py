@@ -156,14 +156,14 @@ def build_signal(highs, lows, closes):
         notes.append("Trend: insufficient data")
 
     if rsi_val is not None:
-        if rsi_val < 30:
+        # momentum confirmation (not reversal) -- keeps RSI aligned with
+        # trend/MACD instead of contradicting them
+        if rsi_val > 50:
             score += 1
-            notes.append(f"RSI {rsi_val:.1f}: oversold")
-        elif rsi_val > 70:
-            score -= 1
-            notes.append(f"RSI {rsi_val:.1f}: overbought")
+            notes.append(f"RSI {rsi_val:.1f}: bullish momentum")
         else:
-            notes.append(f"RSI {rsi_val:.1f}: neutral")
+            score -= 1
+            notes.append(f"RSI {rsi_val:.1f}: bearish momentum")
     else:
         notes.append("RSI: insufficient data")
 
