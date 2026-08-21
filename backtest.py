@@ -18,15 +18,15 @@ import time
 import requests
 
 PAIRS = [
-    ("EUR/USD", "EUR/USD"),
-    ("GBP/USD", "GBP/USD"),
-    ("USD/JPY", "USD/JPY"),
-    ("USD/CHF", "USD/CHF"),
-    ("AUD/USD", "AUD/USD"),
     ("USD/CAD", "USD/CAD"),
-    ("NZD/USD", "NZD/USD"),
     ("XAU/USD", "GOLD (XAU/USD)"),
 ]
+
+# realistic retail spread costs, in price units (round-trip)
+SPREADS = {
+    "USD/CAD": 0.00015,  # ~1.5 pips
+    "XAU/USD": 0.35,     # ~$0.35
+}
 
 WINDOW = 100  # same rolling window the live scanner uses per decision
 ATR_STOP_MULTIPLIER = 1.5
@@ -171,13 +171,16 @@ def fetch_history(symbol, api_key):
     return highs, lows, closes
 
 
-def simulate_pair(label, highs, lows, closes):
-    """Walk forward bar by bar, replaying the exact live decision + tracking logic."""
+def simulate_pair(symbol, label, highs, lows, closes):
+    """Walk forward bar by bar, replaying the exact live decision + tracking logic.
+    Only takes Swing-classified setups; skips Scalp entirely. Subtracts a
+    realistic spread cost (converted to R) from every closed trade."""
     trades_closed = []
     open_trade = None
+    spread = SPREADS.get(symbol, 0.0)
 
     n = len(closes)
-    start = max(60, 0)  # warmup for SMA50/MACD/ATR
+    start = max(60, 0)
 
     for i in range(start, n):
         window_lo = max(0, i - WINDOW + 1)
@@ -187,24 +190,26 @@ def simulate_pair(label, highs, lows, closes):
 
         if open_trade is None:
             sig = build_signal(h_win, l_win, c_win)
-            if sig["direction"] and sig["plan"]:
+            if sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                 p = sig["plan"]
+                risk_dist = abs(p["entry"] - p["sl"])
                 open_trade = {
                     "direction": sig["direction"], "entry": p["entry"], "sl": p["sl"],
                     "tp1": p["tp1"], "tp2": p["tp2"], "tp1_hit": False,
                     "trade_type": sig["trade_type"], "opened_idx": i,
+                    "risk_dist": risk_dist,
                 }
             continue
 
-        # check this candle against the open trade (same logic as live check_open_trade)
         last_high, last_low = highs[i], lows[i]
         d, entry, sl, tp1, tp2 = open_trade["direction"], open_trade["entry"], open_trade["sl"], open_trade["tp1"], open_trade["tp2"]
+        spread_r = (spread / open_trade["risk_dist"]) if open_trade["risk_dist"] else 0
 
         if not open_trade["tp1_hit"]:
             hit_tp1 = (last_high >= tp1) if d == "buy" else (last_low <= tp1)
             hit_sl = (last_low <= sl) if d == "buy" else (last_high >= sl)
             if hit_sl:
-                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "sl", "r": R_SL})
+                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "sl", "r": R_SL - spread_r})
                 open_trade = None
             elif hit_tp1:
                 open_trade["tp1_hit"] = True
@@ -214,10 +219,10 @@ def simulate_pair(label, highs, lows, closes):
             hit_tp2 = (last_high >= tp2) if d == "buy" else (last_low <= tp2)
             hit_be = (last_low <= eff_sl) if d == "buy" else (last_high >= eff_sl)
             if hit_tp2:
-                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "tp2", "r": R_TP2})
+                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "tp2", "r": R_TP2 - spread_r})
                 open_trade = None
             elif hit_be:
-                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "breakeven", "r": R_BE})
+                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "breakeven", "r": R_BE - spread_r})
                 open_trade = None
 
     return trades_closed
@@ -241,7 +246,7 @@ def main():
     for symbol, label in PAIRS:
         try:
             highs, lows, closes = fetch_history(symbol, api_key)
-            trades = simulate_pair(label, highs, lows, closes)
+            trades = simulate_pair(symbol, label, highs, lows, closes)
             all_trades.extend(trades)
             wins = sum(1 for t in trades if t["result"] in ("tp2", "breakeven"))
             wr = (wins / len(trades) * 100) if trades else 0
@@ -268,17 +273,16 @@ def main():
             return f"{len(subset)} trades, {w/len(subset)*100:.0f}% win rate, {'+' if r>=0 else ''}{r:.1f}R"
 
         summary = (
-            f"<b>🔬 Backtest Results</b>  (~7-8 months hourly data)\n\n"
+            f"<b>🔬 Backtest Results v2</b>  (Gold + USD/CAD, Swing-only, spread-adjusted)\n\n"
             f"Total trades: {len(all_trades)}\n"
             f"Wins: {wins}  ·  Losses: {losses}\n"
             f"Win rate: {win_rate:.0f}%\n"
             f"Total R: {'+' if total_r>=0 else ''}{total_r:.2f}\n"
             f"Avg R/trade: {'+' if avg_r>=0 else ''}{avg_r:.2f}\n\n"
-            f"Scalp: {stats_for(scalp_trades)}\n"
-            f"Swing: {stats_for(swing_trades)}\n\n"
             f"<b>By pair:</b>\n" + "\n".join(per_pair_lines) + "\n\n"
-            f"<i>Breakeven-after-TP1 counted as +0.5R. Past performance on historical "
-            f"data does not guarantee future results.</i>"
+            f"<i>Scalp trades excluded. Spread cost (~1.5 pips / ~$0.35 gold) subtracted "
+            f"from every trade. Breakeven-after-TP1 counted as +0.5R minus spread. "
+            f"Past performance does not guarantee future results.</i>"
         )
     else:
         summary = "<b>🔬 Backtest Results</b>\n\nNo trades were generated over the available history.\n\n" + "\n".join(per_pair_lines)
