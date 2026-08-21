@@ -32,13 +32,7 @@ import datetime
 import requests
 
 PAIRS = [
-    ("EUR/USD", "EUR/USD"),
-    ("GBP/USD", "GBP/USD"),
-    ("USD/JPY", "USD/JPY"),
-    ("USD/CHF", "USD/CHF"),
-    ("AUD/USD", "AUD/USD"),
     ("USD/CAD", "USD/CAD"),
-    ("NZD/USD", "NZD/USD"),
     ("XAU/USD", "GOLD (XAU/USD)"),
 ]
 
@@ -368,7 +362,7 @@ def main():
                     del trades[symbol]
             else:
                 sig = build_signal(highs, lows, closes)
-                if sig["direction"] and sig["plan"]:
+                if sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                     p = sig["plan"]
                     trade = {
                         "label": label, "direction": sig["direction"],
