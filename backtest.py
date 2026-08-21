@@ -128,9 +128,11 @@ def build_signal(highs, lows, closes):
         elif price < sma20 < sma50:
             score -= 1
     if rsi_val is not None:
-        if rsi_val < 30:
+        # momentum confirmation (not reversal) -- keeps RSI aligned with
+        # trend/MACD instead of contradicting them
+        if rsi_val > 50:
             score += 1
-        elif rsi_val > 70:
+        else:
             score -= 1
     if macd_val:
         score += 1 if macd_val["macd"] > macd_val["signal"] else -1
