@@ -236,6 +236,9 @@ def decimals_for(symbol):
     return 5
 
 
+HEARTBEAT_SECONDS = 8 * 60 * 60  # send a status ping at least this often
+
+
 def load_state():
     if os.path.exists(STATE_FILE):
         try:
@@ -244,10 +247,11 @@ def load_state():
                 data.setdefault("trades", {})
                 data.setdefault("closed", [])
                 data.setdefault("last_summary_date", None)
+                data.setdefault("last_heartbeat", 0)
                 return data
         except Exception:
             pass
-    return {"trades": {}, "closed": [], "last_summary_date": None}
+    return {"trades": {}, "closed": [], "last_summary_date": None, "last_heartbeat": 0}
 
 
 def save_state(state):
@@ -312,6 +316,19 @@ def build_summary(closed_trades):
         f"Total R: {'+' if total_r >= 0 else ''}{total_r:.2f}\n\n"
         f"<i>Breakeven-after-TP1 counted as +0.5R (assumes half position banked at TP1).</i>"
     )
+
+
+def build_heartbeat(trades):
+    now_str = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    if not trades:
+        return (f"<b>✅ Status check-in</b>  ({now_str})\n\n"
+                f"Bot is running. No open trades right now — watching all {len(PAIRS)} pairs for a new full-agreement setup.")
+    lines = []
+    for symbol, t in trades.items():
+        stage = "past TP1, targeting TP2 (risk-free)" if t.get("tp1_hit") else "targeting TP1"
+        lines.append(f"• {t['label']} — {t['direction'].upper()} [{t.get('trade_type','?')}] — {stage}")
+    return (f"<b>✅ Status check-in</b>  ({now_str})\n\n"
+            f"Bot is running. Open trades ({len(trades)}):\n" + "\n".join(lines))
 
 
 def main():
@@ -385,6 +402,13 @@ def main():
         summary_block = build_summary(recent_closed)
         state["last_summary_date"] = today
 
+    # heartbeat check (at least every 8 hours, even if nothing else happened)
+    heartbeat_block = None
+    now_ts = int(time.time())
+    if now_ts - state.get("last_heartbeat", 0) >= HEARTBEAT_SECONDS:
+        heartbeat_block = build_heartbeat(trades)
+        state["last_heartbeat"] = now_ts
+
     state["trades"] = trades
     state["closed"] = closed_history
     save_state(state)
@@ -396,6 +420,12 @@ def main():
         parts.append("<b>🎯 New High-Conviction Setups</b>\n\n" + "\n\n".join(new_signal_blocks))
     if summary_block:
         parts.append(summary_block)
+    # only tack the heartbeat onto an otherwise-empty cycle, so it doesn't
+    # clutter a message that already has real content
+    if heartbeat_block and not parts:
+        parts.append(heartbeat_block)
+    elif heartbeat_block and parts:
+        state["last_heartbeat"] = now_ts  # still counts as a check-in this cycle
 
     if parts:
         message = "\n\n---\n\n".join(parts)
