@@ -29,10 +29,26 @@ import sys
 import time
 import json
 import datetime
+from zoneinfo import ZoneInfo
 import requests
 
+TZ = ZoneInfo("America/Toronto")
+
+SESSION_OPENS = [
+    ("Sydney", 17, "Asian session (Sydney) opening — week's liquidity begins."),
+    ("Tokyo", 19, "Tokyo session opening, overlapping with Sydney."),
+    ("London", 3, "London session opening — European liquidity, often a volatility pickup."),
+    ("New York", 8, "New York session opening — overlaps London, typically the highest volume window."),
+]
+
 PAIRS = [
+    ("EUR/USD", "EUR/USD"),
+    ("GBP/USD", "GBP/USD"),
+    ("USD/JPY", "USD/JPY"),
+    ("USD/CHF", "USD/CHF"),
+    ("AUD/USD", "AUD/USD"),
     ("USD/CAD", "USD/CAD"),
+    ("NZD/USD", "NZD/USD"),
     ("XAU/USD", "GOLD (XAU/USD)"),
 ]
 
@@ -233,6 +249,40 @@ def decimals_for(symbol):
 HEARTBEAT_SECONDS = 8 * 60 * 60  # send a status ping at least this often
 
 
+RANKING_FILE = "pair_ranking.json"
+
+
+def now_local():
+    return datetime.datetime.now(TZ)
+
+
+def is_market_open(dt):
+    """Forex convention: closed Fri 5pm ET through Sun 5pm ET."""
+    weekday = dt.weekday()  # Mon=0 ... Sun=6
+    if weekday == 4 and dt.hour >= 17:
+        return False
+    if weekday == 5:
+        return False
+    if weekday == 6 and dt.hour < 17:
+        return False
+    return True
+
+
+def load_top_pairs():
+    """Reads the ranking produced by the last backtest run.
+    Returns (allowed_set, best_symbol_or_None)."""
+    if os.path.exists(RANKING_FILE):
+        try:
+            with open(RANKING_FILE, "r") as f:
+                data = json.load(f)
+                ranked = data.get("ranked_symbols", [])
+                if ranked:
+                    return set(ranked[:3]), ranked[0]
+        except Exception:
+            pass
+    return set(), None
+
+
 def load_state():
     if os.path.exists(STATE_FILE):
         try:
@@ -242,10 +292,14 @@ def load_state():
                 data.setdefault("closed", [])
                 data.setdefault("last_summary_date", None)
                 data.setdefault("last_heartbeat", 0)
+                data.setdefault("session_notices", {})
+                data.setdefault("friday_notice_date", None)
+                data.setdefault("sunday_prep_date", None)
                 return data
         except Exception:
             pass
-    return {"trades": {}, "closed": [], "last_summary_date": None, "last_heartbeat": 0}
+    return {"trades": {}, "closed": [], "last_summary_date": None, "last_heartbeat": 0,
+            "session_notices": {}, "friday_notice_date": None, "sunday_prep_date": None}
 
 
 def save_state(state):
@@ -258,6 +312,7 @@ def check_open_trade(trade, highs, lows, closes, d):
     direction = trade["direction"]
     entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
     pair_label = trade["label"]
+    risk_dist = trade.get("risk_dist", abs(entry - sl))
 
     if not trade.get("tp1_hit"):
         if direction == "buy":
@@ -279,19 +334,35 @@ def check_open_trade(trade, highs, lows, closes, d):
         return None, trade, True, None
     else:
         effective_sl = trade.get("effective_sl", entry)
-        if direction == "buy":
-            hit_tp2, hit_be = last_high >= tp2, last_low <= effective_sl
-        else:
-            hit_tp2, hit_be = last_low <= tp2, last_high >= effective_sl
+
+        # trailing checkpoint: once price pushes to 1.5R, lock in more profit
+        # by trailing the stop to 0.75R (only fires once)
+        if not trade.get("trail_hit"):
+            trail_level = entry + risk_dist * 1.5 if direction == "buy" else entry - risk_dist * 1.5
+            hit_trail = (last_high >= trail_level) if direction == "buy" else (last_low <= trail_level)
+            if hit_trail:
+                trade["trail_hit"] = True
+                new_sl = entry + risk_dist * 0.75 if direction == "buy" else entry - risk_dist * 0.75
+                trade["effective_sl"] = new_sl
+                msg = (f"🔵 <b>{pair_label}</b> — Trailing update\n"
+                       f"Price extended toward TP2. Move stop to <code>{new_sl:.{d}f}</code> "
+                       f"(locks in +0.75R). Still holding for TP2 <code>{tp2:.{d}f}</code>.")
+                return msg, trade, True, None
+
+        effective_sl = trade.get("effective_sl", entry)
+        hit_tp2 = (last_high >= tp2) if direction == "buy" else (last_low <= tp2)
+        hit_be = (last_low <= effective_sl) if direction == "buy" else (last_high >= effective_sl)
 
         if hit_tp2:
             msg = (f"🟢🟢 <b>{pair_label}</b> — TP2 hit! Full target\n"
                    f"Closed at <code>{tp2:.{d}f}</code>. <i>Result: +2R</i>")
             return msg, trade, False, ("tp2", R_TP2)
         if hit_be:
-            msg = (f"⚪ <b>{pair_label}</b> — Breakeven\n"
-                   f"Closed flat at entry. <i>Result: +0.5R (TP1 already banked)</i>")
-            return msg, trade, False, ("breakeven", R_BREAKEVEN_AFTER_TP1)
+            locked = "+0.75R (trailed)" if trade.get("trail_hit") else "+0.5R (TP1 banked)"
+            msg = (f"⚪ <b>{pair_label}</b> — Stopped out at trailed level\n"
+                   f"Closed at <code>{effective_sl:.{d}f}</code>. <i>Result: {locked}</i>")
+            r_val = 0.75 if trade.get("trail_hit") else R_BREAKEVEN_AFTER_TP1
+            return msg, trade, False, ("breakeven", r_val)
         return None, trade, True, None
 
 
@@ -325,6 +396,35 @@ def build_heartbeat(trades):
             f"Bot is running. Open trades ({len(trades)}):\n" + "\n".join(lines))
 
 
+def build_friday_warning(trades):
+    lines = []
+    for symbol, t in trades.items():
+        if t.get("tp1_hit"):
+            advice = "TP1 already banked, stop at breakeven or better — safe to hold over the weekend (no downside risk left)."
+        else:
+            advice = "TP1 not yet hit — your stop is still exposing you to weekend gap risk. Consider closing manually or tightening your stop before the close."
+        lines.append(f"• {t['label']} ({t['direction'].upper()}) — {advice}")
+    if not lines:
+        lines = ["No open trades right now — nothing to decide on."]
+    return f"<b>🕔 Market closes in ~1 hour</b> (5pm ET Friday)\n\n" + "\n".join(lines)
+
+
+def build_sunday_prep(api_key):
+    lines = []
+    for symbol, label in PAIRS:
+        try:
+            highs, lows, closes = fetch_ohlc(symbol, api_key)
+            sig = build_signal(highs, lows, closes)
+            bias = "Bullish bias" if sig["direction"] == "buy" else "Bearish bias" if sig["direction"] == "sell" else "No clear bias"
+            lines.append(f"{label}: {bias}")
+        except Exception as e:
+            lines.append(f"{label}: data unavailable ({e})")
+        time.sleep(REQUEST_GAP_SECONDS)
+    return ("<b>🗓️ Sunday Market Prep</b>\n\nTechnical bias heading into the week (based on last available candles):\n"
+            + "\n".join(lines) +
+            "\n\n<i>Technical read only — no news/economic calendar included yet.</i>")
+
+
 def main():
     api_key = os.environ["TWELVE_DATA_API_KEY"]
     tg_token = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -333,93 +433,120 @@ def main():
     state = load_state()
     trades = state["trades"]
     closed_history = state["closed"]
+    top_pairs, best_pair = load_top_pairs()
+
+    now = now_local()
+    today_str = now.date().isoformat()
+    market_open = is_market_open(now)
+
+    weekend_parts = []
+
+    # Friday close warning (fires once, while market is still open)
+    if now.weekday() == 4 and now.hour == 16 and state.get("friday_notice_date") != today_str:
+        weekend_parts.append(build_friday_warning(trades))
+        state["friday_notice_date"] = today_str
+
+    # Sunday prep (fires once, while market still closed, ~2h before open)
+    if now.weekday() == 6 and now.hour == 15 and state.get("sunday_prep_date") != today_str:
+        weekend_parts.append(build_sunday_prep(api_key))
+        state["sunday_prep_date"] = today_str
 
     update_blocks = []
     new_signal_blocks = []
-    newly_closed = []
-
-    for symbol, label in PAIRS:
-        try:
-            highs, lows, closes = fetch_ohlc(symbol, api_key)
-            d = decimals_for(symbol)
-
-            if symbol in trades:
-                msg, updated_trade, still_open, result = check_open_trade(trades[symbol], highs, lows, closes, d)
-                if msg:
-                    update_blocks.append(msg)
-                if still_open:
-                    trades[symbol] = updated_trade
-                elif result:
-                    result_type, r_value = result
-                    record = {
-                        "pair": label, "direction": updated_trade["direction"],
-                        "trade_type": updated_trade.get("trade_type"),
-                        "result": result_type, "r": r_value,
-                        "closed_at": int(time.time()),
-                    }
-                    closed_history.append(record)
-                    newly_closed.append(record)
-                    del trades[symbol]
-            else:
-                sig = build_signal(highs, lows, closes)
-                if sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
-                    p = sig["plan"]
-                    trade = {
-                        "label": label, "direction": sig["direction"],
-                        "entry": p["entry"], "sl": p["sl"], "tp1": p["tp1"], "tp2": p["tp2"],
-                        "tp1_hit": False, "trade_type": sig["trade_type"],
-                        "opened_at": int(time.time()),
-                    }
-                    trades[symbol] = trade
-                    dir_word = "BUY" if sig["direction"] == "buy" else "SELL"
-                    emoji = "🟢🟢" if sig["direction"] == "buy" else "🔴🔴"
-                    block = (
-                        f"{emoji} <b>{label}</b> — <b>{dir_word}</b>  [{sig['trade_type']}]\n"
-                        f"Entry: <code>{p['entry']:.{d}f}</code>\n"
-                        f"SL: <code>{p['sl']:.{d}f}</code>\n"
-                        f"TP1: <code>{p['tp1']:.{d}f}</code>  (1R)\n"
-                        f"TP2: <code>{p['tp2']:.{d}f}</code>  (2R)\n"
-                        f"Risk:Reward  1 : 2\n"
-                        f"<i>Full agreement: {' · '.join(sig['notes'])}</i>"
-                    )
-                    new_signal_blocks.append(block)
-        except Exception as e:
-            print(f"Error on {label}: {e}", file=sys.stderr)
-        time.sleep(REQUEST_GAP_SECONDS)
-
-    # daily summary check (once per UTC day)
-    today = datetime.date.today().isoformat()
+    session_blocks = []
     summary_block = None
-    if state.get("last_summary_date") != today:
-        cutoff = int(time.time()) - 86400
-        recent_closed = [t for t in closed_history if t["closed_at"] >= cutoff]
-        summary_block = build_summary(recent_closed)
-        state["last_summary_date"] = today
-
-    # heartbeat check (at least every 8 hours, even if nothing else happened)
     heartbeat_block = None
-    now_ts = int(time.time())
-    if now_ts - state.get("last_heartbeat", 0) >= HEARTBEAT_SECONDS:
-        heartbeat_block = build_heartbeat(trades)
+
+    if market_open:
+        # session-open pings
+        for name, hour, desc in SESSION_OPENS:
+            key = f"{name}_{today_str}"
+            if now.hour == hour and state["session_notices"].get(key) is not True:
+                session_blocks.append(f"<b>🌍 {name} session opening</b>\n{desc}")
+                state["session_notices"][key] = True
+
+        for symbol, label in PAIRS:
+            try:
+                highs, lows, closes = fetch_ohlc(symbol, api_key)
+                d = decimals_for(symbol)
+
+                if symbol in trades:
+                    msg, updated_trade, still_open, result = check_open_trade(trades[symbol], highs, lows, closes, d)
+                    if msg:
+                        update_blocks.append(msg)
+                    if still_open:
+                        trades[symbol] = updated_trade
+                    elif result:
+                        result_type, r_value = result
+                        record = {
+                            "pair": label, "direction": updated_trade["direction"],
+                            "trade_type": updated_trade.get("trade_type"),
+                            "result": result_type, "r": r_value,
+                            "closed_at": int(time.time()),
+                        }
+                        closed_history.append(record)
+                        del trades[symbol]
+                else:
+                    # only take new trades on top-ranked pairs (falls back to
+                    # all pairs if no backtest ranking has been generated yet)
+                    eligible = (not top_pairs) or (symbol in top_pairs)
+                    sig = build_signal(highs, lows, closes)
+                    if eligible and sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
+                        p = sig["plan"]
+                        trade = {
+                            "label": label, "direction": sig["direction"],
+                            "entry": p["entry"], "sl": p["sl"], "tp1": p["tp1"], "tp2": p["tp2"],
+                            "tp1_hit": False, "trade_type": sig["trade_type"],
+                            "opened_at": int(time.time()),
+                            "risk_dist": abs(p["entry"] - p["sl"]),
+                        }
+                        trades[symbol] = trade
+                        dir_word = "BUY" if sig["direction"] == "buy" else "SELL"
+                        emoji = "🟢🟢" if sig["direction"] == "buy" else "🔴🔴"
+                        star = " ⭐ (top-ranked pair)" if symbol == best_pair else ""
+                        block = (
+                            f"{emoji} <b>{label}</b> — <b>{dir_word}</b>  [{sig['trade_type']}]{star}\n"
+                            f"Entry: <code>{p['entry']:.{d}f}</code>\n"
+                            f"SL: <code>{p['sl']:.{d}f}</code>\n"
+                            f"TP1: <code>{p['tp1']:.{d}f}</code>  (1R)\n"
+                            f"TP2: <code>{p['tp2']:.{d}f}</code>  (2R)\n"
+                            f"Risk:Reward  1 : 2\n"
+                            f"<i>Full agreement: {' · '.join(sig['notes'])}</i>"
+                        )
+                        new_signal_blocks.append(block)
+            except Exception as e:
+                print(f"Error on {label}: {e}", file=sys.stderr)
+            time.sleep(REQUEST_GAP_SECONDS)
+
+        # daily summary check (once per UTC day)
+        today_utc = datetime.date.today().isoformat()
+        if state.get("last_summary_date") != today_utc:
+            cutoff = int(time.time()) - 86400
+            recent_closed = [t for t in closed_history if t["closed_at"] >= cutoff]
+            summary_block = build_summary(recent_closed)
+            state["last_summary_date"] = today_utc
+
+        # heartbeat (only during market hours -- no weekend pings)
+        now_ts = int(time.time())
+        if now_ts - state.get("last_heartbeat", 0) >= HEARTBEAT_SECONDS:
+            heartbeat_block = build_heartbeat(trades)
         state["last_heartbeat"] = now_ts
+    else:
+        print("Market closed — skipping scan (weekend quiet mode).")
 
     state["trades"] = trades
     state["closed"] = closed_history
     save_state(state)
 
-    parts = []
+    parts = list(weekend_parts) + session_blocks
     if update_blocks:
         parts.append("<b>📌 Trade Updates</b>\n\n" + "\n\n".join(update_blocks))
     if new_signal_blocks:
         parts.append("<b>🎯 New High-Conviction Setups</b>\n\n" + "\n\n".join(new_signal_blocks))
     if summary_block:
         parts.append(summary_block)
-    # only tack the heartbeat onto an otherwise-empty cycle, so it doesn't
-    # clutter a message that already has real content
-    if heartbeat_block and not parts:
+    if heartbeat_block and len(parts) == 0:
         parts.append(heartbeat_block)
-    elif heartbeat_block and parts:
-        state["last_heartbeat"] = now_ts  # still counts as a check-in this cycle
 
     if parts:
         message = "\n\n---\n\n".join(parts)
