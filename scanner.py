@@ -504,14 +504,20 @@ def main():
                         dir_word = "BUY" if sig["direction"] == "buy" else "SELL"
                         emoji = "🟢🟢" if sig["direction"] == "buy" else "🔴🔴"
                         star = " ⭐ (top-ranked pair)" if symbol == best_pair else ""
+                        order_type = "BUY NOW" if sig["direction"] == "buy" else "SELL NOW"
+                        limit_type = "Buy Limit" if sig["direction"] == "buy" else "Sell Limit"
+                        buffer_pips = trade["risk_dist"] * 0.2  # ~20% of risk distance
                         block = (
                             f"{emoji} <b>{label}</b> — <b>{dir_word}</b>  [{sig['trade_type']}]{star}\n"
+                            f"Order type: <b>{order_type}</b> (market)\n"
                             f"Entry: <code>{p['entry']:.{d}f}</code>\n"
                             f"SL: <code>{p['sl']:.{d}f}</code>\n"
                             f"TP1: <code>{p['tp1']:.{d}f}</code>  (1R)\n"
                             f"TP2: <code>{p['tp2']:.{d}f}</code>  (2R)\n"
                             f"Risk:Reward  1 : 2\n"
-                            f"<i>Full agreement: {' · '.join(sig['notes'])}</i>"
+                            f"<i>Full agreement: {' · '.join(sig['notes'])}</i>\n"
+                            f"<i>If price has already moved more than ~{buffer_pips:.{d}f} away from entry by the time you act, "
+                            f"place a <b>{limit_type}</b> at <code>{p['entry']:.{d}f}</code> instead of chasing at market.</i>"
                         )
                         new_signal_blocks.append(block)
             except Exception as e:
@@ -530,7 +536,7 @@ def main():
         now_ts = int(time.time())
         if now_ts - state.get("last_heartbeat", 0) >= HEARTBEAT_SECONDS:
             heartbeat_block = build_heartbeat(trades)
-        state["last_heartbeat"] = now_ts
+            state["last_heartbeat"] = now_ts  # only reset the clock when we actually send one
     else:
         print("Market closed — skipping scan (weekend quiet mode).")
 
