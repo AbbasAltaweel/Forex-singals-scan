@@ -231,11 +231,64 @@ def fetch_ohlc(symbol, api_key):
     return highs, lows, closes
 
 
-def send_telegram(token, chat_id, text):
+def send_telegram(token, chat_id, text, reply_to=None):
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    r = requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}, timeout=20)
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
+    if reply_to:
+        payload["reply_to_message_id"] = reply_to
+    r = requests.post(url, data=payload, timeout=20)
     if r.status_code != 200:
         print(f"Telegram send failed: {r.status_code} {r.text}", file=sys.stderr)
+        return None
+    try:
+        return r.json()["result"]["message_id"]
+    except Exception:
+        return None
+
+
+TAKEN_WORDS = {"took", "taken", "yes", "in", "entered", "took it"}
+SKIP_WORDS = {"skip", "skipped", "no", "pass", "passed", "didn't", "didnt", "not taking"}
+
+
+def poll_telegram_replies(token, chat_id, offset):
+    """Fetch new messages sent to the bot since `offset`. Returns (updates, new_offset)."""
+    url = f"https://api.telegram.org/bot{token}/getUpdates"
+    params = {"timeout": 0}
+    if offset:
+        params["offset"] = offset
+    r = requests.get(url, params=params, timeout=20)
+    if r.status_code != 200:
+        print(f"getUpdates failed: {r.status_code} {r.text}", file=sys.stderr)
+        return [], offset
+    data = r.json()
+    results = data.get("result", [])
+    new_offset = offset
+    matched = []
+    for upd in results:
+        new_offset = max(new_offset, upd["update_id"] + 1) if offset else upd["update_id"] + 1
+        msg = upd.get("message")
+        if not msg:
+            continue
+        if str(msg.get("chat", {}).get("id")) != str(chat_id):
+            continue
+        reply_to_msg = msg.get("reply_to_message")
+        text = (msg.get("text") or "").strip()
+        if reply_to_msg and text:
+            matched.append({
+                "reply_to_message_id": reply_to_msg["message_id"],
+                "text": text,
+                "sender_message_id": msg["message_id"],
+            })
+    return matched, new_offset
+
+
+def classify_reply(text):
+    t = text.lower().strip()
+    if any(w in t for w in TAKEN_WORDS):
+        return "taken"
+    if any(w in t for w in SKIP_WORDS):
+        return "skip"
+    return None
 
 
 def decimals_for(symbol):
@@ -295,11 +348,13 @@ def load_state():
                 data.setdefault("session_notices", {})
                 data.setdefault("friday_notice_date", None)
                 data.setdefault("sunday_prep_date", None)
+                data.setdefault("telegram_offset", None)
                 return data
         except Exception:
             pass
     return {"trades": {}, "closed": [], "last_summary_date": None, "last_heartbeat": 0,
-            "session_notices": {}, "friday_notice_date": None, "sunday_prep_date": None}
+            "session_notices": {}, "friday_notice_date": None, "sunday_prep_date": None,
+            "telegram_offset": None}
 
 
 def save_state(state):
@@ -435,6 +490,26 @@ def main():
     closed_history = state["closed"]
     top_pairs, best_pair = load_top_pairs()
 
+    # check for replies to past signal messages (e.g. "took it" / "skip")
+    replies, new_offset = poll_telegram_replies(tg_token, tg_chat, state.get("telegram_offset"))
+    state["telegram_offset"] = new_offset
+    for reply in replies:
+        classification = classify_reply(reply["text"])
+        matched_symbol, matched_label = None, None
+        for symbol, t in trades.items():
+            if t.get("signal_message_id") == reply["reply_to_message_id"]:
+                matched_symbol, matched_label = symbol, t["label"]
+                break
+        if matched_symbol and classification:
+            trades[matched_symbol]["user_taken"] = (classification == "taken")
+            word = "taken" if classification == "taken" else "skipped"
+            send_telegram(tg_token, tg_chat, f"✅ Logged: {matched_label} marked as {word}.")
+        elif matched_symbol and not classification:
+            send_telegram(tg_token, tg_chat,
+                           f"Got your reply on {matched_label}, but couldn't tell if that means you took it or not — "
+                           f"try replying with \"took it\" or \"skip\".")
+        # if no match at all (reply to something else / old message), stay silent
+
     now = now_local()
     today_str = now.date().isoformat()
     market_open = is_market_open(now)
@@ -452,7 +527,6 @@ def main():
         state["sunday_prep_date"] = today_str
 
     update_blocks = []
-    new_signal_blocks = []
     session_blocks = []
     summary_block = None
     heartbeat_block = None
@@ -483,6 +557,7 @@ def main():
                             "trade_type": updated_trade.get("trade_type"),
                             "result": result_type, "r": r_value,
                             "closed_at": int(time.time()),
+                            "user_taken": updated_trade.get("user_taken"),
                         }
                         closed_history.append(record)
                         del trades[symbol]
@@ -508,6 +583,7 @@ def main():
                         limit_type = "Buy Limit" if sig["direction"] == "buy" else "Sell Limit"
                         buffer_pips = trade["risk_dist"] * 0.2  # ~20% of risk distance
                         block = (
+                            f"🎯 <b>New High-Conviction Setup</b>\n\n"
                             f"{emoji} <b>{label}</b> — <b>{dir_word}</b>  [{sig['trade_type']}]{star}\n"
                             f"Order type: <b>{order_type}</b> (market)\n"
                             f"Entry: <code>{p['entry']:.{d}f}</code>\n"
@@ -517,9 +593,12 @@ def main():
                             f"Risk:Reward  1 : 2\n"
                             f"<i>Full agreement: {' · '.join(sig['notes'])}</i>\n"
                             f"<i>If price has already moved more than ~{buffer_pips:.{d}f} away from entry by the time you act, "
-                            f"place a <b>{limit_type}</b> at <code>{p['entry']:.{d}f}</code> instead of chasing at market.</i>"
+                            f"place a <b>{limit_type}</b> at <code>{p['entry']:.{d}f}</code> instead of chasing at market.</i>\n\n"
+                            f"<i>Reply \"took it\" or \"skip\" to this message to log what you did.</i>"
                         )
-                        new_signal_blocks.append(block)
+                        msg_id = send_telegram(tg_token, tg_chat, block)
+                        trade["signal_message_id"] = msg_id
+                        print(block)
             except Exception as e:
                 print(f"Error on {label}: {e}", file=sys.stderr)
             time.sleep(REQUEST_GAP_SECONDS)
@@ -547,8 +626,6 @@ def main():
     parts = list(weekend_parts) + session_blocks
     if update_blocks:
         parts.append("<b>📌 Trade Updates</b>\n\n" + "\n\n".join(update_blocks))
-    if new_signal_blocks:
-        parts.append("<b>🎯 New High-Conviction Setups</b>\n\n" + "\n\n".join(new_signal_blocks))
     if summary_block:
         parts.append(summary_block)
     if heartbeat_block and len(parts) == 0:
