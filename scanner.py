@@ -442,12 +442,12 @@ def main():
     weekend_parts = []
 
     # Friday close warning (fires once, while market is still open)
-    if now.weekday() == 4 and now.hour == 16 and state.get("friday_notice_date") != today_str:
+    if now.weekday() == 4 and 16 <= now.hour < 17 and state.get("friday_notice_date") != today_str:
         weekend_parts.append(build_friday_warning(trades))
         state["friday_notice_date"] = today_str
 
     # Sunday prep (fires once, while market still closed, ~2h before open)
-    if now.weekday() == 6 and now.hour == 15 and state.get("sunday_prep_date") != today_str:
+    if now.weekday() == 6 and 15 <= now.hour < 17 and state.get("sunday_prep_date") != today_str:
         weekend_parts.append(build_sunday_prep(api_key))
         state["sunday_prep_date"] = today_str
 
@@ -461,7 +461,7 @@ def main():
         # session-open pings
         for name, hour, desc in SESSION_OPENS:
             key = f"{name}_{today_str}"
-            if now.hour == hour and state["session_notices"].get(key) is not True:
+            if now.hour >= hour and state["session_notices"].get(key) is not True:
                 session_blocks.append(f"<b>🌍 {name} session opening</b>\n{desc}")
                 state["session_notices"][key] = True
 
