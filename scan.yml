@@ -8,12 +8,9 @@ on:
 permissions:
   contents: write
 
-# CRITICAL FIX: prevents two runs from executing at the same time and
-# racing to save trades_state.json, which was causing duplicate signals
-# and silently lost trade updates (including missed SL notifications).
 concurrency:
   group: forex-signal-scan
-  cancel-in-progress: false   # queue overlapping runs instead of dropping them
+  cancel-in-progress: false
 
 jobs:
   scan:
@@ -41,7 +38,6 @@ jobs:
         run: |
           git config user.name "forex-scanner-bot"
           git config user.email "actions@github.com"
-          git pull --rebase
           git add trades_state.json
           git diff --staged --quiet || git commit -m "Update trade state [skip ci]"
           git push
