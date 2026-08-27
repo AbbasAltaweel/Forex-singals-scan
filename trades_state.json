@@ -1,1 +1,13 @@
- {"trades": {}}
+{
+  "trades": {},
+  "closed": [],
+  "last_summary_date": "2026-08-27",
+  "last_heartbeat": 1787860420,
+  "session_notices": {
+    "London_2026-08-27": true,
+    "New York_2026-08-27": true
+  },
+  "friday_notice_date": null,
+  "sunday_prep_date": null,
+  "telegram_offset": 218000786
+}
