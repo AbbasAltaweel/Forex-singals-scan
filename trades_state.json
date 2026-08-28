@@ -57,7 +57,7 @@
     }
   ],
   "last_summary_date": "2026-08-28",
-  "last_heartbeat": 1787918526,
+  "last_heartbeat": 1787947337,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -66,7 +66,7 @@
     "London_2026-08-28": true,
     "New York_2026-08-28": true
   },
-  "friday_notice_date": null,
+  "friday_notice_date": "2026-08-28",
   "sunday_prep_date": null,
   "telegram_offset": 218000788
 }
