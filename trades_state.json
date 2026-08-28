@@ -7,11 +7,12 @@
       "sl": 4596.329359622516,
       "tp1": 4526.888680377484,
       "tp2": 4492.168340754967,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1787928374,
       "risk_dist": 34.720339622515894,
-      "signal_message_id": 155
+      "signal_message_id": 155,
+      "effective_sl": 4561.60902
     }
   },
   "closed": [
