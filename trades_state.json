@@ -1,5 +1,19 @@
 {
-  "trades": {},
+  "trades": {
+    "XAU/USD": {
+      "label": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "entry": 4546.80223,
+      "sl": 4579.647660693945,
+      "tp1": 4513.9567993060555,
+      "tp2": 4481.111368612111,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1787926621,
+      "risk_dist": 32.84543069394476,
+      "signal_message_id": 153
+    }
+  },
   "closed": [
     {
       "pair": "GOLD (XAU/USD)",
