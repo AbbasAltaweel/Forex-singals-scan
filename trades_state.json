@@ -12,19 +12,6 @@
       "opened_at": 1787935627,
       "risk_dist": 42.1494733663576,
       "signal_message_id": 159
-    },
-    "NZD/USD": {
-      "label": "NZD/USD",
-      "direction": "sell",
-      "entry": 0.59086,
-      "sl": 0.592172136809248,
-      "tp1": 0.5895478631907521,
-      "tp2": 0.5882357263815042,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1787940966,
-      "risk_dist": 0.0013121368092479102,
-      "signal_message_id": 160
     }
   },
   "closed": [
@@ -54,17 +41,29 @@
       "r": 2.0,
       "closed_at": 1787934682,
       "user_taken": null
+    },
+    {
+      "pair": "NZD/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1788123663,
+      "user_taken": null
     }
   ],
-  "last_summary_date": "2026-08-28",
-  "last_heartbeat": 1787947337,
+  "last_summary_date": "2026-08-30",
+  "last_heartbeat": 1788123677,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
     "Sydney_2026-08-27": true,
     "Tokyo_2026-08-27": true,
     "London_2026-08-28": true,
-    "New York_2026-08-28": true
+    "New York_2026-08-28": true,
+    "Sydney_2026-08-30": true,
+    "London_2026-08-30": true,
+    "New York_2026-08-30": true
   },
   "friday_notice_date": "2026-08-28",
   "sunday_prep_date": "2026-08-30",
