@@ -12,6 +12,19 @@
       "opened_at": 1788164164,
       "risk_dist": 17.620313344638816,
       "signal_message_id": 176
+    },
+    "EUR/USD": {
+      "label": "EUR/USD",
+      "direction": "buy",
+      "entry": 1.16013,
+      "sl": 1.1576765583674553,
+      "tp1": 1.162583441632545,
+      "tp2": 1.1650368832650897,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788170836,
+      "risk_dist": 0.002453441632544795,
+      "signal_message_id": 177
     }
   },
   "closed": [
