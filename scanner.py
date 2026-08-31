@@ -143,6 +143,19 @@ def atr(highs, lows, closes, period=14):
     return atr_val
 
 
+VOLATILITY_SPIKE_MULTIPLIER = 2.0  # current ATR vs its own 50-period average
+
+
+def is_volatility_spike(highs, lows, closes):
+    """True if current volatility is unusually elevated vs its recent norm --
+    a sign of a shock/thin-liquidity event rather than a clean trending move."""
+    current_atr = atr(highs, lows, closes, 14)
+    baseline_atr = atr(highs, lows, closes, 50)
+    if not current_atr or not baseline_atr or baseline_atr == 0:
+        return False
+    return current_atr > baseline_atr * VOLATILITY_SPIKE_MULTIPLIER
+
+
 def build_signal(highs, lows, closes):
     price = closes[-1]
     sma20, sma50 = sma(closes, 20), sma(closes, 50)
@@ -196,7 +209,20 @@ def build_signal(highs, lows, closes):
     plan = None
     trade_type = None
     if direction and atr_val:
-        stop_dist = atr_val * ATR_STOP_MULTIPLIER
+        buffer = atr_val * 0.25  # small cushion beyond the swing point, avoids sitting exactly on an obvious level
+        swing_lookback = 20
+
+        if direction == "buy":
+            swing_low = min(lows[-swing_lookback:])
+            structure_dist = price - (swing_low - buffer)
+        else:
+            swing_high = max(highs[-swing_lookback:])
+            structure_dist = (swing_high + buffer) - price
+
+        # bound the structure-based distance with ATR so it can't be
+        # degenerately tight (whipsaw risk) or excessively wide (bad R:R)
+        stop_dist = max(atr_val * 0.75, min(structure_dist, atr_val * 3.0))
+
         if direction == "buy":
             sl = price - stop_dist
             tp1 = price + stop_dist * RR_TP1
@@ -229,6 +255,64 @@ def fetch_ohlc(symbol, api_key):
     lows = [float(v["low"]) for v in values]
     closes = [float(v["close"]) for v in values]
     return highs, lows, closes
+
+
+PAIR_CURRENCIES = {
+    "EUR/USD": {"EUR", "USD"}, "GBP/USD": {"GBP", "USD"}, "USD/JPY": {"USD", "JPY"},
+    "USD/CHF": {"USD", "CHF"}, "AUD/USD": {"AUD", "USD"}, "USD/CAD": {"USD", "CAD"},
+    "NZD/USD": {"NZD", "USD"}, "XAU/USD": {"USD"},
+}
+NEWS_BUFFER_MINUTES = 45  # skip new trades within this window of a high-impact release
+FF_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+
+
+def fetch_ff_calendar():
+    """Free, official weekly economic calendar feed from Fair Economy
+    (Forex Factory's parent company) -- no API key needed, and this is an
+    intentional data export, not a scrape of their site. Covers the current
+    week. Returns a list of dicts with dt (aware UTC datetime), currency,
+    impact, title. Returns [] on any failure -- this filter is a nice-to-have,
+    never a reason to crash the scan."""
+    try:
+        r = requests.get(FF_CALENDAR_URL, timeout=15)
+        if r.status_code != 200:
+            return []
+        events = []
+        for e in r.json():
+            try:
+                dt = datetime.datetime.fromisoformat(e["date"]).astimezone(datetime.timezone.utc)
+            except Exception:
+                continue
+            events.append({
+                "dt": dt, "currency": e.get("country", ""),
+                "impact": e.get("impact", ""), "title": e.get("title", "unknown event"),
+            })
+        return events
+    except Exception as ex:
+        print(f"FF calendar fetch failed (non-fatal): {ex}", file=sys.stderr)
+        return []
+
+
+def is_near_high_impact_news(events, pair_symbol, now_utc):
+    currencies = PAIR_CURRENCIES.get(pair_symbol, set())
+    for e in events:
+        if e["impact"] != "High" or e["currency"] not in currencies:
+            continue
+        delta_minutes = abs((now_utc - e["dt"]).total_seconds()) / 60
+        if delta_minutes <= NEWS_BUFFER_MINUTES:
+            return True, e["title"], e["dt"]
+    return False, None, None
+
+
+def is_holiday_today(events, pair_symbol, now_utc):
+    currencies = PAIR_CURRENCIES.get(pair_symbol, set())
+    today = now_utc.date()
+    for e in events:
+        if e["impact"] != "Holiday" or e["currency"] not in currencies:
+            continue
+        if e["dt"].date() == today:
+            return True, e["title"]
+    return False, None
 
 
 def send_telegram(token, chat_id, text, reply_to=None):
@@ -489,6 +573,7 @@ def main():
     trades = state["trades"]
     closed_history = state["closed"]
     top_pairs, best_pair = load_top_pairs()
+    news_events = fetch_ff_calendar()  # free, no key needed
 
     # check for replies to past signal messages (e.g. "took it" / "skip")
     replies, new_offset = poll_telegram_replies(tg_token, tg_chat, state.get("telegram_offset"))
@@ -565,7 +650,30 @@ def main():
                     # only take new trades on top-ranked pairs (falls back to
                     # all pairs if no backtest ranking has been generated yet)
                     eligible = (not top_pairs) or (symbol in top_pairs)
+                    now_utc = datetime.datetime.now(datetime.timezone.utc)
+                    near_news, news_name, news_time = is_near_high_impact_news(news_events, symbol, now_utc)
+                    on_holiday, holiday_name = is_holiday_today(news_events, symbol, now_utc)
+                    vol_spike = is_volatility_spike(highs, lows, closes)
+                    if near_news or on_holiday or vol_spike:
+                        eligible = False
                     sig = build_signal(highs, lows, closes)
+                    if sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
+                        if near_news:
+                            update_blocks.append(
+                                f"⏸️ <b>{label}</b> setup skipped — high-impact news (\"{news_name}\") "
+                                f"within {NEWS_BUFFER_MINUTES} min. Avoiding new entries around the release."
+                            )
+                        elif on_holiday:
+                            update_blocks.append(
+                                f"⏸️ <b>{label}</b> setup skipped — {holiday_name} today. "
+                                f"Thin holiday liquidity, avoiding new entries."
+                            )
+                        elif vol_spike:
+                            update_blocks.append(
+                                f"⏸️ <b>{label}</b> setup skipped — volatility spike detected "
+                                f"(current ATR &gt; {VOLATILITY_SPIKE_MULTIPLIER}x its 50-period average). "
+                                f"Sitting out unusual/erratic conditions."
+                            )
                     if eligible and sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                         p = sig["plan"]
                         trade = {
