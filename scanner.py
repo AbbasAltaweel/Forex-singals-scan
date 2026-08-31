@@ -649,31 +649,23 @@ def main():
                 else:
                     # only take new trades on top-ranked pairs (falls back to
                     # all pairs if no backtest ranking has been generated yet)
+                    # only take new trades on top-ranked pairs (falls back to
+                    # all pairs if no backtest ranking has been generated yet)
                     eligible = (not top_pairs) or (symbol in top_pairs)
                     now_utc = datetime.datetime.now(datetime.timezone.utc)
                     near_news, news_name, news_time = is_near_high_impact_news(news_events, symbol, now_utc)
                     on_holiday, holiday_name = is_holiday_today(news_events, symbol, now_utc)
                     vol_spike = is_volatility_spike(highs, lows, closes)
-                    if near_news or on_holiday or vol_spike:
-                        eligible = False
+
+                    risk_flags = []
+                    if near_news:
+                        risk_flags.append(f"high-impact news (\"{news_name}\") within {NEWS_BUFFER_MINUTES} min")
+                    if on_holiday:
+                        risk_flags.append(f"{holiday_name} — thin holiday liquidity")
+                    if vol_spike:
+                        risk_flags.append(f"volatility spike (ATR &gt; {VOLATILITY_SPIKE_MULTIPLIER}x its 50-period average)")
+
                     sig = build_signal(highs, lows, closes)
-                    if sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
-                        if near_news:
-                            update_blocks.append(
-                                f"⏸️ <b>{label}</b> setup skipped — high-impact news (\"{news_name}\") "
-                                f"within {NEWS_BUFFER_MINUTES} min. Avoiding new entries around the release."
-                            )
-                        elif on_holiday:
-                            update_blocks.append(
-                                f"⏸️ <b>{label}</b> setup skipped — {holiday_name} today. "
-                                f"Thin holiday liquidity, avoiding new entries."
-                            )
-                        elif vol_spike:
-                            update_blocks.append(
-                                f"⏸️ <b>{label}</b> setup skipped — volatility spike detected "
-                                f"(current ATR &gt; {VOLATILITY_SPIKE_MULTIPLIER}x its 50-period average). "
-                                f"Sitting out unusual/erratic conditions."
-                            )
                     if eligible and sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                         p = sig["plan"]
                         trade = {
@@ -690,8 +682,19 @@ def main():
                         order_type = "BUY NOW" if sig["direction"] == "buy" else "SELL NOW"
                         limit_type = "Buy Limit" if sig["direction"] == "buy" else "Sell Limit"
                         buffer_pips = trade["risk_dist"] * 0.2  # ~20% of risk distance
+
+                        if len(risk_flags) >= 2:
+                            header = "🔴 <b>High-Risk Setup</b> — multiple risk factors stacked"
+                            risk_block = "⚠️ <b>Risk factors (multiple):</b>\n" + "\n".join(f"  • {f}" for f in risk_flags) + "\n\n"
+                        elif len(risk_flags) == 1:
+                            header = "🟡 <b>New Setup — Caution</b>"
+                            risk_block = f"⚠️ <b>Risk factor:</b> {risk_flags[0]}\n\n"
+                        else:
+                            header = "🎯 <b>New High-Conviction Setup</b>"
+                            risk_block = ""
+
                         block = (
-                            f"🎯 <b>New High-Conviction Setup</b>\n\n"
+                            f"{header}\n\n"
                             f"{emoji} <b>{label}</b> — <b>{dir_word}</b>  [{sig['trade_type']}]{star}\n"
                             f"Order type: <b>{order_type}</b> (market)\n"
                             f"Entry: <code>{p['entry']:.{d}f}</code>\n"
@@ -699,7 +702,8 @@ def main():
                             f"TP1: <code>{p['tp1']:.{d}f}</code>  (1R)\n"
                             f"TP2: <code>{p['tp2']:.{d}f}</code>  (2R)\n"
                             f"Risk:Reward  1 : 2\n"
-                            f"<i>Full agreement: {' · '.join(sig['notes'])}</i>\n"
+                            f"<i>Full agreement: {' · '.join(sig['notes'])}</i>\n\n"
+                            f"{risk_block}"
                             f"<i>If price has already moved more than ~{buffer_pips:.{d}f} away from entry by the time you act, "
                             f"place a <b>{limit_type}</b> at <code>{p['entry']:.{d}f}</code> instead of chasing at market.</i>\n\n"
                             f"<i>Reply \"took it\" or \"skip\" to this message to log what you did.</i>"
