@@ -12,6 +12,32 @@
       "opened_at": 1788170836,
       "risk_dist": 0.002453441632544795,
       "signal_message_id": 177
+    },
+    "USD/JPY": {
+      "label": "USD/JPY",
+      "direction": "sell",
+      "entry": 159.76035,
+      "sl": 160.142115885854,
+      "tp1": 159.37858411414598,
+      "tp2": 158.99681822829197,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788179292,
+      "risk_dist": 0.3817658858540085,
+      "signal_message_id": 180
+    },
+    "USD/CAD": {
+      "label": "USD/CAD",
+      "direction": "sell",
+      "entry": 1.38838,
+      "sl": 1.3912150847582248,
+      "tp1": 1.3855449152417751,
+      "tp2": 1.3827098304835501,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788179314,
+      "risk_dist": 0.002835084758224804,
+      "signal_message_id": 181
     }
   },
   "closed": [
