@@ -212,7 +212,7 @@ def fetch_history(symbol, api_key):
     return highs, lows, closes
 
 
-def check_open_trade(trade, last_high, last_low):
+def check_open_trade(trade, last_high, last_low, use_trailing=True):
     direction = trade["direction"]
     entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
     risk_dist = trade["risk_dist"]
@@ -227,7 +227,7 @@ def check_open_trade(trade, last_high, last_low):
             trade["effective_sl"] = entry
         return None, True
 
-    if not trade.get("trail_hit"):
+    if use_trailing and not trade.get("trail_hit"):
         trail_level = entry + risk_dist * 1.5 if direction == "buy" else entry - risk_dist * 1.5
         hit_trail = (last_high >= trail_level) if direction == "buy" else (last_low <= trail_level)
         if hit_trail:
@@ -254,25 +254,9 @@ def send_telegram(token, chat_id, text):
         print(f"Telegram send failed: {r.status_code} {r.text}", file=sys.stderr)
 
 
-def main():
-    api_key = os.environ["TWELVE_DATA_API_KEY"]
-    tg_token = os.environ["TELEGRAM_BOT_TOKEN"]
-    tg_chat = os.environ["TELEGRAM_CHAT_ID"]
-
-    data = {}
-    fetch_errors = []
-    for symbol, label in PAIRS:
-        try:
-            highs, lows, closes = fetch_history(symbol, api_key)
-            data[symbol] = {"highs": highs, "lows": lows, "closes": closes, "label": label}
-        except Exception as e:
-            fetch_errors.append(f"{label}: {e}")
-        time.sleep(7)
-
-    if not data:
-        send_telegram(tg_token, tg_chat, "<b>🔬 Backtest Results v4</b>\n\nAll pair fetches failed:\n" + "\n".join(fetch_errors))
-        return
-
+def run_simulation(data, use_trailing):
+    """Walks forward through all pairs' data together (so correlation can be
+    tracked), returns the list of closed trade records."""
     min_len = min(len(d["closes"]) for d in data.values())
     open_trades = {}
     all_trades = []
@@ -281,7 +265,7 @@ def main():
     for i in range(start, min_len):
         for symbol in list(open_trades.keys()):
             d = data[symbol]
-            result, still_open = check_open_trade(open_trades[symbol], d["highs"][i], d["lows"][i])
+            result, still_open = check_open_trade(open_trades[symbol], d["highs"][i], d["lows"][i], use_trailing)
             if not still_open:
                 trade = open_trades.pop(symbol)
                 result_type, base_r = result
@@ -314,6 +298,33 @@ def main():
                 "trade_type": sig["trade_type"], "risk_dist": abs(p["entry"] - p["sl"]),
                 "flags": flags,
             }
+
+    return all_trades
+
+
+def main():
+    api_key = os.environ["TWELVE_DATA_API_KEY"]
+    tg_token = os.environ["TELEGRAM_BOT_TOKEN"]
+    tg_chat = os.environ["TELEGRAM_CHAT_ID"]
+
+    data = {}
+    fetch_errors = []
+    for symbol, label in PAIRS:
+        try:
+            highs, lows, closes = fetch_history(symbol, api_key)
+            data[symbol] = {"highs": highs, "lows": lows, "closes": closes, "label": label}
+        except Exception as e:
+            fetch_errors.append(f"{label}: {e}")
+        time.sleep(7)
+
+    if not data:
+        send_telegram(tg_token, tg_chat, "<b>🔬 Backtest Results v7</b>\n\nAll pair fetches failed:\n" + "\n".join(fetch_errors))
+        return
+
+    # run the SAME historical data twice -- entries are identical either way,
+    # only exit management (trailing tier on/off) differs
+    all_trades = run_simulation(data, use_trailing=True)
+    all_trades_notrail = run_simulation(data, use_trailing=False)
 
     def stats_for(subset):
         if not subset:
@@ -424,14 +435,36 @@ def main():
             f"{split_block}"
         )
 
+        # trailing tier A/B comparison
+        wins_nt = sum(1 for t in all_trades_notrail if t["result"] in ("tp2", "breakeven_trail", "breakeven_notrail"))
+        total_r_nt = sum(t["r"] for t in all_trades_notrail)
+        win_rate_nt = (wins_nt / len(all_trades_notrail) * 100) if all_trades_notrail else 0
+        pf_nt = profit_factor(all_trades_notrail)
+        pf_nt_str = "∞ (no losses)" if pf_nt == float("inf") else f"{pf_nt:.2f}"
+        dd_nt, dd_nt_idx = max_drawdown(all_trades_notrail)
+        verdict = (
+            "trailing tier is HELPING — keep it" if total_r > total_r_nt else
+            "trailing tier is HURTING — consider removing it" if total_r < total_r_nt else
+            "no difference either way"
+        )
+        ab_block = (
+            f"<b>🧪 A/B test: trailing tier on vs off</b>\n"
+            f"WITH trailing (current live logic): {len(all_trades)} trades, {win_rate:.0f}% win rate, "
+            f"{'+' if total_r>=0 else ''}{total_r:.1f}R, PF {pf_str}, DD -{dd:.1f}R\n"
+            f"WITHOUT trailing (TP1→BE→TP2/SL only): {len(all_trades_notrail)} trades, {win_rate_nt:.0f}% win rate, "
+            f"{'+' if total_r_nt>=0 else ''}{total_r_nt:.1f}R, PF {pf_nt_str}, DD -{dd_nt:.1f}R\n"
+            f"<b>Verdict: {verdict}</b>\n\n"
+        )
+
         summary = (
-            f"<b>🔬 Backtest Results v6</b>  (Gold-focused, quality metrics)\n\n"
+            f"<b>🔬 Backtest Results v7</b>  (Gold-focused, trailing tier A/B test)\n\n"
             f"Total trades: {len(all_trades)}\n"
             f"Wins: {wins}  ·  Losses: {losses}\n"
             f"Win rate: {win_rate:.0f}%\n"
             f"Total R: {'+' if total_r>=0 else ''}{total_r:.2f}\n"
             f"Avg R/trade: {'+' if avg_r>=0 else ''}{avg_r:.2f}\n\n"
             f"{top_line}"
+            f"{ab_block}"
             f"{breakdown}"
             f"{quality_block}"
             f"<b>Does the risk-flag system actually work?</b>\n"
@@ -446,7 +479,7 @@ def main():
             f"does not guarantee future results.</i>"
         )
     else:
-        summary = "<b>🔬 Backtest Results v4</b>\n\nNo trades were generated over the available history."
+        summary = "<b>🔬 Backtest Results v7</b>\n\nNo trades were generated over the available history."
         if fetch_errors:
             summary += "\n\nFetch errors:\n" + "\n".join(fetch_errors)
 
