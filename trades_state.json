@@ -40,19 +40,6 @@
       "signal_message_id": 181,
       "effective_sl": 1.38838
     },
-    "AUD/USD": {
-      "label": "AUD/USD",
-      "direction": "buy",
-      "entry": 0.71753,
-      "sl": 0.7157754964024152,
-      "tp1": 0.7192845035975848,
-      "tp2": 0.7210390071951696,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788221745,
-      "risk_dist": 0.0017545035975847778,
-      "signal_message_id": 188
-    },
     "XAU/USD": {
       "label": "GOLD (XAU/USD)",
       "direction": "sell",
@@ -169,6 +156,15 @@
       "result": "sl",
       "r": -1.0,
       "closed_at": 1788236039,
+      "user_taken": null
+    },
+    {
+      "pair": "AUD/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1788248747,
       "user_taken": null
     }
   ],
