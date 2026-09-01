@@ -64,6 +64,19 @@
       "opened_at": 1788272077,
       "risk_dist": 0.328658369166817,
       "signal_message_id": 210
+    },
+    "NZD/USD": {
+      "label": "NZD/USD",
+      "direction": "sell",
+      "entry": 0.59073,
+      "sl": 0.5928306682873185,
+      "tp1": 0.5886293317126815,
+      "tp2": 0.586528663425363,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788273075,
+      "risk_dist": 0.0021006682873184745,
+      "signal_message_id": 214
     }
   },
   "closed": [
