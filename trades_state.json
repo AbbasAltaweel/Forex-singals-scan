@@ -78,6 +78,19 @@
       "opened_at": 1788254140,
       "risk_dist": 0.002103494511420778,
       "signal_message_id": 204
+    },
+    "AUD/USD": {
+      "label": "AUD/USD",
+      "direction": "sell",
+      "entry": 0.71441,
+      "sl": 0.7164389038122744,
+      "tp1": 0.7123810961877256,
+      "tp2": 0.7103521923754512,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788261416,
+      "risk_dist": 0.002028903812274385,
+      "signal_message_id": 205
     }
   },
   "closed": [
