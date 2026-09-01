@@ -40,21 +40,6 @@
       "signal_message_id": 181,
       "effective_sl": 1.38838
     },
-    "XAU/USD": {
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4431.66407,
-      "sl": 4467.818074804889,
-      "tp1": 4395.510065195111,
-      "tp2": 4359.3560603902215,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1788236067,
-      "risk_dist": 36.154004804889155,
-      "signal_message_id": 193,
-      "effective_sl": 4404.548566396333,
-      "trail_hit": true
-    },
     "NZD/USD": {
       "label": "NZD/USD",
       "direction": "sell",
@@ -167,6 +152,15 @@
       "result": "sl",
       "r": -1.0,
       "closed_at": 1788248747,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1788252372,
       "user_taken": null
     }
   ],
