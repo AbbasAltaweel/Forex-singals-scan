@@ -290,6 +290,40 @@ def get_cached_daily_trend(symbol, api_key, state):
     return trend
 
 
+def h4_trend_direction(symbol, api_key):
+    """Intermediate-timeframe trend check (Elder Triple Screen style):
+    price vs its 20-period SMA on the 4-hour chart. Sits between the H1
+    entry timeframe and the daily macro trend. Non-fatal on failure."""
+    try:
+        _, _, closes = fetch_ohlc(symbol, api_key, interval="4h", outputsize=30)
+        s20 = sma(closes, 20)
+        if not s20:
+            return None
+        price = closes[-1]
+        if price > s20 * 1.001:
+            return "buy"
+        if price < s20 * 0.999:
+            return "sell"
+        return None
+    except Exception as e:
+        print(f"H4 trend check failed for {symbol} (non-fatal): {e}", file=sys.stderr)
+        return None
+
+
+def get_cached_h4_trend(symbol, api_key, state):
+    """Refetched once every 4 hours per pair (bucketed by UTC hour block),
+    not every 15-minute cycle -- keeps API usage sane."""
+    cache = state.setdefault("h4_trend_cache", {})
+    now = datetime.datetime.now(datetime.timezone.utc)
+    bucket = f"{now.date().isoformat()}-{(now.hour // 4) * 4}"
+    entry = cache.get(symbol)
+    if entry and entry.get("bucket") == bucket:
+        return entry.get("trend")
+    trend = h4_trend_direction(symbol, api_key)
+    cache[symbol] = {"trend": trend, "bucket": bucket}
+    return trend
+
+
 PAIR_CURRENCIES = {
     "EUR/USD": {"EUR", "USD"}, "GBP/USD": {"GBP", "USD"}, "USD/JPY": {"USD", "JPY"},
     "USD/CHF": {"USD", "CHF"}, "AUD/USD": {"AUD", "USD"}, "USD/CAD": {"USD", "CAD"},
@@ -482,12 +516,13 @@ def load_state():
                 data.setdefault("sunday_prep_date", None)
                 data.setdefault("telegram_offset", None)
                 data.setdefault("daily_trend_cache", {})
+                data.setdefault("h4_trend_cache", {})
                 return data
         except Exception:
             pass
     return {"trades": {}, "closed": [], "last_summary_date": None, "last_heartbeat": 0,
             "session_notices": {}, "friday_notice_date": None, "sunday_prep_date": None,
-            "telegram_offset": None, "daily_trend_cache": {}}
+            "telegram_offset": None, "daily_trend_cache": {}, "h4_trend_cache": {}}
 
 
 def save_state(state):
@@ -723,6 +758,10 @@ def main():
                         daily_trend = get_cached_daily_trend(symbol, api_key, state)
                         if daily_trend and daily_trend != sig["direction"]:
                             risk_flags.append(f"counter-trend on daily chart (daily bias: {daily_trend.upper()})")
+
+                        h4_trend = get_cached_h4_trend(symbol, api_key, state)
+                        if h4_trend and h4_trend != sig["direction"]:
+                            risk_flags.append(f"counter-trend on 4h chart (4h bias: {h4_trend.upper()})")
 
                     if eligible and sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                         p = sig["plan"]
