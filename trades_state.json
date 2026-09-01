@@ -78,6 +78,19 @@
       "opened_at": 1788273075,
       "risk_dist": 0.0021006682873184745,
       "signal_message_id": 214
+    },
+    "GBP/USD": {
+      "label": "GBP/USD",
+      "direction": "sell",
+      "entry": 1.35333,
+      "sl": 1.3562344793465624,
+      "tp1": 1.3504255206534375,
+      "tp2": 1.347521041306875,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788275729,
+      "risk_dist": 0.0029044793465624608,
+      "signal_message_id": 216
     }
   },
   "closed": [
