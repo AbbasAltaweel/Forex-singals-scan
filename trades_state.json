@@ -13,19 +13,6 @@
       "risk_dist": 0.002453441632544795,
       "signal_message_id": 177
     },
-    "USD/JPY": {
-      "label": "USD/JPY",
-      "direction": "sell",
-      "entry": 159.76035,
-      "sl": 160.142115885854,
-      "tp1": 159.37858411414598,
-      "tp2": 158.99681822829197,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788179292,
-      "risk_dist": 0.3817658858540085,
-      "signal_message_id": 180
-    },
     "USD/CAD": {
       "label": "USD/CAD",
       "direction": "sell",
@@ -200,6 +187,15 @@
       "result": "breakeven",
       "r": 0.75,
       "closed_at": 1788252372,
+      "user_taken": null
+    },
+    {
+      "pair": "USD/JPY",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1788262237,
       "user_taken": null
     }
   ],
