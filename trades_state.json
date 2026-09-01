@@ -65,6 +65,19 @@
       "opened_at": 1788253071,
       "risk_dist": 51.40422637079337,
       "signal_message_id": 203
+    },
+    "USD/CHF": {
+      "label": "USD/CHF",
+      "direction": "buy",
+      "entry": 0.80991,
+      "sl": 0.8078065054885792,
+      "tp1": 0.8120134945114208,
+      "tp2": 0.8141169890228416,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788254140,
+      "risk_dist": 0.002103494511420778,
+      "signal_message_id": 204
     }
   },
   "closed": [
