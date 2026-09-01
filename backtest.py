@@ -1,7 +1,20 @@
 """
-Backtest: replays the EXACT signal logic from scanner.py against ~7-8 months
-of historical hourly data, to show what the strategy would have actually
-produced -- real win rate, total R, breakdown by pair and by scalp/swing.
+Backtest v4: replays the CURRENT live signal logic (structure-based stops,
+trailing tier, correlation-and-volatility tagging) against ~7-8 months of
+historical hourly data across all 8 pairs simultaneously, so cross-pair
+correlation can be tracked the same way the live bot does.
+
+SCOPE HONESTY:
+  - Structure-based stops, the 1.5R trailing tier, correlation tagging, and
+    the volatility-spike tag are all backtested properly here.
+  - The news/holiday filter is NOT backtested -- the free calendar feed only
+    covers the current week, there's no historical archive available.
+  - The H4/Daily trend confirmation tags are NOT backtested here -- that
+    needs careful multi-timeframe timestamp alignment, a bigger undertaking
+    left for a future pass.
+  - Every trade is still TAKEN regardless of flags (matching live "warn, not
+    block" behavior) -- but results are reported split by flag status, which
+    actually tests whether the flags are predictive, not just decorative.
 
 This is a one-off analysis, not part of the live 15-minute scan. Run it
 manually from the Actions tab whenever you want a fresh check.
@@ -15,27 +28,39 @@ Required environment variables (same secrets already in your repo):
 import os
 import sys
 import time
+import json
 import requests
 
 PAIRS = [
+    ("EUR/USD", "EUR/USD"),
+    ("GBP/USD", "GBP/USD"),
+    ("USD/JPY", "USD/JPY"),
+    ("USD/CHF", "USD/CHF"),
+    ("AUD/USD", "AUD/USD"),
     ("USD/CAD", "USD/CAD"),
+    ("NZD/USD", "NZD/USD"),
     ("XAU/USD", "GOLD (XAU/USD)"),
 ]
 
-# realistic retail spread costs, in price units (round-trip)
-SPREADS = {
-    "USD/CAD": 0.00015,  # ~1.5 pips
-    "XAU/USD": 0.35,     # ~$0.35
+PAIR_CURRENCIES = {
+    "EUR/USD": {"EUR", "USD"}, "GBP/USD": {"GBP", "USD"}, "USD/JPY": {"USD", "JPY"},
+    "USD/CHF": {"USD", "CHF"}, "AUD/USD": {"AUD", "USD"}, "USD/CAD": {"USD", "CAD"},
+    "NZD/USD": {"NZD", "USD"}, "XAU/USD": {"USD"},
 }
 
-WINDOW = 100  # same rolling window the live scanner uses per decision
-ATR_STOP_MULTIPLIER = 1.5
+SPREADS = {
+    "EUR/USD": 0.00012, "GBP/USD": 0.00015, "USD/JPY": 0.015,
+    "USD/CHF": 0.00018, "AUD/USD": 0.00015, "USD/CAD": 0.00015,
+    "NZD/USD": 0.00020, "XAU/USD": 0.35,
+}
+
+WINDOW = 100
 RR_TP1, RR_TP2 = 1.0, 2.0
 SCALP_PCT_THRESHOLD = 0.4
-R_TP2, R_SL, R_BE = 2.0, -1.0, 0.5
+R_TP2, R_SL, R_BE, R_TRAIL_BE = 2.0, -1.0, 0.5, 0.75
+VOLATILITY_SPIKE_MULTIPLIER = 2.0
 
 
-# ---------- identical indicator math to scanner.py ----------
 def sma(values, period):
     if len(values) < period:
         return None
@@ -114,6 +139,14 @@ def atr(highs, lows, closes, period=14):
     return atr_val
 
 
+def is_volatility_spike(highs, lows, closes):
+    current_atr = atr(highs, lows, closes, 14)
+    baseline_atr = atr(highs, lows, closes, 50)
+    if not current_atr or not baseline_atr or baseline_atr == 0:
+        return False
+    return current_atr > baseline_atr * VOLATILITY_SPIKE_MULTIPLIER
+
+
 def build_signal(highs, lows, closes):
     price = closes[-1]
     sma20, sma50 = sma(closes, 20), sma(closes, 50)
@@ -128,12 +161,7 @@ def build_signal(highs, lows, closes):
         elif price < sma20 < sma50:
             score -= 1
     if rsi_val is not None:
-        # momentum confirmation (not reversal) -- keeps RSI aligned with
-        # trend/MACD instead of contradicting them
-        if rsi_val > 50:
-            score += 1
-        else:
-            score -= 1
+        score += 1 if rsi_val > 50 else -1
     if macd_val:
         score += 1 if macd_val["macd"] > macd_val["signal"] else -1
 
@@ -141,7 +169,16 @@ def build_signal(highs, lows, closes):
 
     plan, trade_type = None, None
     if direction and atr_val:
-        stop_dist = atr_val * ATR_STOP_MULTIPLIER
+        buffer = atr_val * 0.25
+        swing_lookback = 20
+        if direction == "buy":
+            swing_low = min(lows[-swing_lookback:])
+            structure_dist = price - (swing_low - buffer)
+        else:
+            swing_high = max(highs[-swing_lookback:])
+            structure_dist = (swing_high + buffer) - price
+        stop_dist = max(atr_val * 0.75, min(structure_dist, atr_val * 3.0))
+
         if direction == "buy":
             sl = price - stop_dist
             tp1, tp2 = price + stop_dist * RR_TP1, price + stop_dist * RR_TP2
@@ -155,6 +192,17 @@ def build_signal(highs, lows, closes):
     return {"direction": direction, "plan": plan, "trade_type": trade_type}
 
 
+def check_correlation(symbol, direction, open_trades):
+    my_currencies = PAIR_CURRENCIES.get(symbol, set())
+    for open_symbol, t in open_trades.items():
+        if open_symbol == symbol:
+            continue
+        their_currencies = PAIR_CURRENCIES.get(open_symbol, set())
+        if (my_currencies & their_currencies) and t["direction"] == direction:
+            return True
+    return False
+
+
 def fetch_history(symbol, api_key):
     url = "https://api.twelvedata.com/time_series"
     params = {"symbol": symbol, "interval": "1h", "outputsize": 5000, "apikey": api_key}
@@ -164,68 +212,45 @@ def fetch_history(symbol, api_key):
         raise RuntimeError(data.get("message", "API error"))
     if "values" not in data:
         raise RuntimeError("No data returned")
-    values = list(reversed(data["values"]))  # oldest -> newest
+    values = list(reversed(data["values"]))
     highs = [float(v["high"]) for v in values]
     lows = [float(v["low"]) for v in values]
     closes = [float(v["close"]) for v in values]
     return highs, lows, closes
 
 
-def simulate_pair(symbol, label, highs, lows, closes):
-    """Walk forward bar by bar, replaying the exact live decision + tracking logic.
-    Only takes Swing-classified setups; skips Scalp entirely. Subtracts a
-    realistic spread cost (converted to R) from every closed trade."""
-    trades_closed = []
-    open_trade = None
-    spread = SPREADS.get(symbol, 0.0)
+def check_open_trade(trade, last_high, last_low):
+    direction = trade["direction"]
+    entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
+    risk_dist = trade["risk_dist"]
 
-    n = len(closes)
-    start = max(60, 0)
+    if not trade["tp1_hit"]:
+        hit_tp1 = (last_high >= tp1) if direction == "buy" else (last_low <= tp1)
+        hit_sl = (last_low <= sl) if direction == "buy" else (last_high >= sl)
+        if hit_sl:
+            return ("sl", R_SL), False
+        if hit_tp1:
+            trade["tp1_hit"] = True
+            trade["effective_sl"] = entry
+        return None, True
 
-    for i in range(start, n):
-        window_lo = max(0, i - WINDOW + 1)
-        h_win = highs[window_lo:i + 1]
-        l_win = lows[window_lo:i + 1]
-        c_win = closes[window_lo:i + 1]
+    if not trade.get("trail_hit"):
+        trail_level = entry + risk_dist * 1.5 if direction == "buy" else entry - risk_dist * 1.5
+        hit_trail = (last_high >= trail_level) if direction == "buy" else (last_low <= trail_level)
+        if hit_trail:
+            trade["trail_hit"] = True
+            trade["effective_sl"] = entry + risk_dist * 0.75 if direction == "buy" else entry - risk_dist * 0.75
 
-        if open_trade is None:
-            sig = build_signal(h_win, l_win, c_win)
-            if sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
-                p = sig["plan"]
-                risk_dist = abs(p["entry"] - p["sl"])
-                open_trade = {
-                    "direction": sig["direction"], "entry": p["entry"], "sl": p["sl"],
-                    "tp1": p["tp1"], "tp2": p["tp2"], "tp1_hit": False,
-                    "trade_type": sig["trade_type"], "opened_idx": i,
-                    "risk_dist": risk_dist,
-                }
-            continue
+    eff_sl = trade["effective_sl"]
+    hit_tp2 = (last_high >= tp2) if direction == "buy" else (last_low <= tp2)
+    hit_be = (last_low <= eff_sl) if direction == "buy" else (last_high >= eff_sl)
 
-        last_high, last_low = highs[i], lows[i]
-        d, entry, sl, tp1, tp2 = open_trade["direction"], open_trade["entry"], open_trade["sl"], open_trade["tp1"], open_trade["tp2"]
-        spread_r = (spread / open_trade["risk_dist"]) if open_trade["risk_dist"] else 0
-
-        if not open_trade["tp1_hit"]:
-            hit_tp1 = (last_high >= tp1) if d == "buy" else (last_low <= tp1)
-            hit_sl = (last_low <= sl) if d == "buy" else (last_high >= sl)
-            if hit_sl:
-                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "sl", "r": R_SL - spread_r})
-                open_trade = None
-            elif hit_tp1:
-                open_trade["tp1_hit"] = True
-                open_trade["effective_sl"] = entry
-        else:
-            eff_sl = open_trade.get("effective_sl", entry)
-            hit_tp2 = (last_high >= tp2) if d == "buy" else (last_low <= tp2)
-            hit_be = (last_low <= eff_sl) if d == "buy" else (last_high >= eff_sl)
-            if hit_tp2:
-                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "tp2", "r": R_TP2 - spread_r})
-                open_trade = None
-            elif hit_be:
-                trades_closed.append({"pair": label, "type": open_trade["trade_type"], "result": "breakeven", "r": R_BE - spread_r})
-                open_trade = None
-
-    return trades_closed
+    if hit_tp2:
+        return ("tp2", R_TP2), False
+    if hit_be:
+        r_val = R_TRAIL_BE if trade.get("trail_hit") else R_BE
+        return ("breakeven", r_val), False
+    return None, True
 
 
 def send_telegram(token, chat_id, text):
@@ -240,21 +265,96 @@ def main():
     tg_token = os.environ["TELEGRAM_BOT_TOKEN"]
     tg_chat = os.environ["TELEGRAM_CHAT_ID"]
 
-    all_trades = []
-    per_pair_lines = []
-
+    data = {}
+    fetch_errors = []
     for symbol, label in PAIRS:
         try:
             highs, lows, closes = fetch_history(symbol, api_key)
-            trades = simulate_pair(symbol, label, highs, lows, closes)
-            all_trades.extend(trades)
-            wins = sum(1 for t in trades if t["result"] in ("tp2", "breakeven"))
-            wr = (wins / len(trades) * 100) if trades else 0
-            total_r = sum(t["r"] for t in trades)
-            per_pair_lines.append(f"{label}: {len(trades)} trades, {wr:.0f}% win rate, {'+' if total_r>=0 else ''}{total_r:.1f}R")
+            data[symbol] = {"highs": highs, "lows": lows, "closes": closes, "label": label}
         except Exception as e:
-            per_pair_lines.append(f"{label}: error — {e}")
+            fetch_errors.append(f"{label}: {e}")
         time.sleep(7)
+
+    if not data:
+        send_telegram(tg_token, tg_chat, "<b>🔬 Backtest Results v4</b>\n\nAll pair fetches failed:\n" + "\n".join(fetch_errors))
+        return
+
+    min_len = min(len(d["closes"]) for d in data.values())
+    open_trades = {}
+    all_trades = []
+
+    start = max(60, 0)
+    for i in range(start, min_len):
+        for symbol in list(open_trades.keys()):
+            d = data[symbol]
+            result, still_open = check_open_trade(open_trades[symbol], d["highs"][i], d["lows"][i])
+            if not still_open:
+                trade = open_trades.pop(symbol)
+                result_type, base_r = result
+                spread = SPREADS.get(symbol, 0.0)
+                spread_r = spread / trade["risk_dist"] if trade["risk_dist"] else 0
+                all_trades.append({
+                    "pair": d["label"], "type": trade["trade_type"], "result": result_type,
+                    "r": base_r - spread_r, "flags": trade["flags"],
+                })
+
+        for symbol, d in data.items():
+            if symbol in open_trades:
+                continue
+            window_lo = max(0, i - WINDOW + 1)
+            h_win, l_win, c_win = d["highs"][window_lo:i + 1], d["lows"][window_lo:i + 1], d["closes"][window_lo:i + 1]
+            sig = build_signal(h_win, l_win, c_win)
+            if not (sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing"):
+                continue
+
+            flags = []
+            if check_correlation(symbol, sig["direction"], open_trades):
+                flags.append("correlated")
+            if is_volatility_spike(h_win, l_win, c_win):
+                flags.append("vol_spike")
+
+            p = sig["plan"]
+            open_trades[symbol] = {
+                "direction": sig["direction"], "entry": p["entry"], "sl": p["sl"],
+                "tp1": p["tp1"], "tp2": p["tp2"], "tp1_hit": False, "trail_hit": False,
+                "trade_type": sig["trade_type"], "risk_dist": abs(p["entry"] - p["sl"]),
+                "flags": flags,
+            }
+
+    def stats_for(subset):
+        if not subset:
+            return "n/a"
+        w = sum(1 for t in subset if t["result"] in ("tp2", "breakeven"))
+        r = sum(t["r"] for t in subset)
+        return f"{len(subset)} trades, {w/len(subset)*100:.0f}% win rate, {'+' if r>=0 else ''}{r:.1f}R"
+
+    clean_trades = [t for t in all_trades if not t["flags"]]
+    flagged_trades = [t for t in all_trades if t["flags"]]
+    corr_trades = [t for t in all_trades if "correlated" in t["flags"]]
+    vol_trades = [t for t in all_trades if "vol_spike" in t["flags"]]
+
+    pair_stats = []
+    for symbol, d in data.items():
+        p_trades = [t for t in all_trades if t["pair"] == d["label"]]
+        wins = sum(1 for t in p_trades if t["result"] in ("tp2", "breakeven"))
+        wr = (wins / len(p_trades) * 100) if p_trades else 0
+        total_r = sum(t["r"] for t in p_trades)
+        pair_stats.append((symbol, d["label"], len(p_trades), wr, total_r))
+
+    ranked = sorted([p for p in pair_stats if p[2] >= 15], key=lambda p: p[4], reverse=True)
+    unranked = [p for p in pair_stats if p not in ranked]
+    per_pair_lines = []
+    for i2, (symbol, label, count, wr, total_r) in enumerate(ranked):
+        tag = " 🏆" if i2 == 0 else ""
+        per_pair_lines.append(f"{label}: {count} trades, {wr:.0f}% win rate, {'+' if total_r>=0 else ''}{total_r:.1f}R{tag}")
+    for symbol, label, count, wr, total_r in unranked:
+        per_pair_lines.append(f"{label}: {count} trades (sample too small to rank), {'+' if total_r>=0 else ''}{total_r:.1f}R")
+
+    try:
+        with open("pair_ranking.json", "w") as f:
+            json.dump({"ranked_symbols": [p[0] for p in ranked], "generated_at": int(time.time())}, f, indent=2)
+    except Exception as e:
+        print(f"Could not save ranking file: {e}", file=sys.stderr)
 
     if all_trades:
         wins = sum(1 for t in all_trades if t["result"] in ("tp2", "breakeven"))
@@ -262,30 +362,31 @@ def main():
         win_rate = wins / len(all_trades) * 100
         total_r = sum(t["r"] for t in all_trades)
         avg_r = total_r / len(all_trades)
-        scalp_trades = [t for t in all_trades if t["type"] == "Scalp"]
-        swing_trades = [t for t in all_trades if t["type"] == "Swing"]
-
-        def stats_for(subset):
-            if not subset:
-                return "n/a"
-            w = sum(1 for t in subset if t["result"] in ("tp2", "breakeven"))
-            r = sum(t["r"] for t in subset)
-            return f"{len(subset)} trades, {w/len(subset)*100:.0f}% win rate, {'+' if r>=0 else ''}{r:.1f}R"
+        top_line = f"🏆 Top pair: <b>{ranked[0][1]}</b> ({'+' if ranked[0][4]>=0 else ''}{ranked[0][4]:.1f}R, {ranked[0][2]} trades)\n\n" if ranked else ""
 
         summary = (
-            f"<b>🔬 Backtest Results v2</b>  (Gold + USD/CAD, Swing-only, spread-adjusted)\n\n"
+            f"<b>🔬 Backtest Results v4</b>  (structure stops, trailing tier, correlation + volatility tagging)\n\n"
             f"Total trades: {len(all_trades)}\n"
             f"Wins: {wins}  ·  Losses: {losses}\n"
             f"Win rate: {win_rate:.0f}%\n"
             f"Total R: {'+' if total_r>=0 else ''}{total_r:.2f}\n"
             f"Avg R/trade: {'+' if avg_r>=0 else ''}{avg_r:.2f}\n\n"
+            f"{top_line}"
+            f"<b>Does the risk-flag system actually work?</b>\n"
+            f"No flags: {stats_for(clean_trades)}\n"
+            f"Any flag: {stats_for(flagged_trades)}\n"
+            f"  — correlated: {stats_for(corr_trades)}\n"
+            f"  — volatility spike: {stats_for(vol_trades)}\n\n"
             f"<b>By pair:</b>\n" + "\n".join(per_pair_lines) + "\n\n"
-            f"<i>Scalp trades excluded. Spread cost (~1.5 pips / ~$0.35 gold) subtracted "
-            f"from every trade. Breakeven-after-TP1 counted as +0.5R minus spread. "
-            f"Past performance does not guarantee future results.</i>"
+            f"<i>Scalp trades excluded. Spread cost subtracted. News/holiday filter and "
+            f"H4/Daily confirmation are NOT included in this backtest (see script header "
+            f"for why) — everything else matches live logic exactly. Past performance "
+            f"does not guarantee future results.</i>"
         )
     else:
-        summary = "<b>🔬 Backtest Results</b>\n\nNo trades were generated over the available history.\n\n" + "\n".join(per_pair_lines)
+        summary = "<b>🔬 Backtest Results v4</b>\n\nNo trades were generated over the available history."
+        if fetch_errors:
+            summary += "\n\nFetch errors:\n" + "\n".join(fetch_errors)
 
     send_telegram(tg_token, tg_chat, summary)
     print(summary)
