@@ -252,5 +252,7 @@
   },
   "friday_notice_date": "2026-08-28",
   "sunday_prep_date": "2026-08-30",
-  "telegram_offset": 218000788
+  "telegram_offset": 218000788,
+  "daily_trend_cache": {},
+  "h4_trend_cache": {}
 }
