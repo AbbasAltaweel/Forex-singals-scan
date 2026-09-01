@@ -52,7 +52,8 @@
       "opened_at": 1788236067,
       "risk_dist": 36.154004804889155,
       "signal_message_id": 193,
-      "effective_sl": 4431.66407
+      "effective_sl": 4404.548566396333,
+      "trail_hit": true
     },
     "NZD/USD": {
       "label": "NZD/USD",
