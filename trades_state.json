@@ -13,20 +13,6 @@
       "risk_dist": 0.002453441632544795,
       "signal_message_id": 177
     },
-    "NZD/USD": {
-      "label": "NZD/USD",
-      "direction": "sell",
-      "entry": 0.59086,
-      "sl": 0.5925997073544544,
-      "tp1": 0.5891202926455457,
-      "tp2": 0.5873805852910913,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1788238955,
-      "risk_dist": 0.0017397073544543895,
-      "signal_message_id": 195,
-      "effective_sl": 0.59086
-    },
     "XAU/USD": {
       "label": "GOLD (XAU/USD)",
       "direction": "sell",
@@ -65,6 +51,19 @@
       "opened_at": 1788261416,
       "risk_dist": 0.002028903812274385,
       "signal_message_id": 205
+    },
+    "USD/JPY": {
+      "label": "USD/JPY",
+      "direction": "buy",
+      "entry": 159.99708,
+      "sl": 159.6684216308332,
+      "tp1": 160.32573836916683,
+      "tp2": 160.65439673833367,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788272077,
+      "risk_dist": 0.328658369166817,
+      "signal_message_id": 210
     }
   },
   "closed": [
@@ -192,6 +191,15 @@
       "result": "breakeven",
       "r": 0.5,
       "closed_at": 1788264952,
+      "user_taken": null
+    },
+    {
+      "pair": "NZD/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.5,
+      "closed_at": 1788272107,
       "user_taken": null
     }
   ],
