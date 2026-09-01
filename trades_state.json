@@ -47,11 +47,12 @@
       "sl": 4467.818074804889,
       "tp1": 4395.510065195111,
       "tp2": 4359.3560603902215,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1788236067,
       "risk_dist": 36.154004804889155,
-      "signal_message_id": 193
+      "signal_message_id": 193,
+      "effective_sl": 4431.66407
     },
     "NZD/USD": {
       "label": "NZD/USD",
