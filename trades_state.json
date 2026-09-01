@@ -33,11 +33,12 @@
       "sl": 1.3912150847582248,
       "tp1": 1.3855449152417751,
       "tp2": 1.3827098304835501,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1788179314,
       "risk_dist": 0.002835084758224804,
-      "signal_message_id": 181
+      "signal_message_id": 181,
+      "effective_sl": 1.38838
     },
     "NZD/USD": {
       "label": "NZD/USD",
@@ -51,6 +52,19 @@
       "opened_at": 1788220913,
       "risk_dist": 0.0013954053503418828,
       "signal_message_id": 186
+    },
+    "AUD/USD": {
+      "label": "AUD/USD",
+      "direction": "buy",
+      "entry": 0.71753,
+      "sl": 0.7157754964024152,
+      "tp1": 0.7192845035975848,
+      "tp2": 0.7210390071951696,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788221745,
+      "risk_dist": 0.0017545035975847778,
+      "signal_message_id": 188
     }
   },
   "closed": [
