@@ -33,11 +33,12 @@
       "sl": 0.8078065054885792,
       "tp1": 0.8120134945114208,
       "tp2": 0.8141169890228416,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1788254140,
       "risk_dist": 0.002103494511420778,
-      "signal_message_id": 204
+      "signal_message_id": 204,
+      "effective_sl": 0.80991
     },
     "AUD/USD": {
       "label": "AUD/USD",
