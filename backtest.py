@@ -32,13 +32,6 @@ import json
 import requests
 
 PAIRS = [
-    ("EUR/USD", "EUR/USD"),
-    ("GBP/USD", "GBP/USD"),
-    ("USD/JPY", "USD/JPY"),
-    ("USD/CHF", "USD/CHF"),
-    ("AUD/USD", "AUD/USD"),
-    ("USD/CAD", "USD/CAD"),
-    ("NZD/USD", "NZD/USD"),
     ("XAU/USD", "GOLD (XAU/USD)"),
 ]
 
@@ -248,8 +241,9 @@ def check_open_trade(trade, last_high, last_low):
     if hit_tp2:
         return ("tp2", R_TP2), False
     if hit_be:
-        r_val = R_TRAIL_BE if trade.get("trail_hit") else R_BE
-        return ("breakeven", r_val), False
+        if trade.get("trail_hit"):
+            return ("breakeven_trail", R_TRAIL_BE), False
+        return ("breakeven_notrail", R_BE), False
     return None, True
 
 
@@ -324,7 +318,7 @@ def main():
     def stats_for(subset):
         if not subset:
             return "n/a"
-        w = sum(1 for t in subset if t["result"] in ("tp2", "breakeven"))
+        w = sum(1 for t in subset if t["result"] in ("tp2", "breakeven_trail", "breakeven_notrail"))
         r = sum(t["r"] for t in subset)
         return f"{len(subset)} trades, {w/len(subset)*100:.0f}% win rate, {'+' if r>=0 else ''}{r:.1f}R"
 
@@ -336,7 +330,7 @@ def main():
     pair_stats = []
     for symbol, d in data.items():
         p_trades = [t for t in all_trades if t["pair"] == d["label"]]
-        wins = sum(1 for t in p_trades if t["result"] in ("tp2", "breakeven"))
+        wins = sum(1 for t in p_trades if t["result"] in ("tp2", "breakeven_trail", "breakeven_notrail"))
         wr = (wins / len(p_trades) * 100) if p_trades else 0
         total_r = sum(t["r"] for t in p_trades)
         pair_stats.append((symbol, d["label"], len(p_trades), wr, total_r))
@@ -357,21 +351,40 @@ def main():
         print(f"Could not save ranking file: {e}", file=sys.stderr)
 
     if all_trades:
-        wins = sum(1 for t in all_trades if t["result"] in ("tp2", "breakeven"))
+        wins = sum(1 for t in all_trades if t["result"] in ("tp2", "breakeven_trail", "breakeven_notrail"))
         losses = sum(1 for t in all_trades if t["result"] == "sl")
         win_rate = wins / len(all_trades) * 100
         total_r = sum(t["r"] for t in all_trades)
         avg_r = total_r / len(all_trades)
         top_line = f"🏆 Top pair: <b>{ranked[0][1]}</b> ({'+' if ranked[0][4]>=0 else ''}{ranked[0][4]:.1f}R, {ranked[0][2]} trades)\n\n" if ranked else ""
 
+        full_wins = [t for t in all_trades if t["result"] == "tp2"]
+        trail_wins = [t for t in all_trades if t["result"] == "breakeven_trail"]
+        notrail_wins = [t for t in all_trades if t["result"] == "breakeven_notrail"]
+        sl_losses = [t for t in all_trades if t["result"] == "sl"]
+
+        def bucket_line(label, subset, r_each):
+            n = len(subset)
+            pct = (n / len(all_trades) * 100) if all_trades else 0
+            return f"{label}: {n} ({pct:.0f}%) — {r_each:+.2f}R each = {'+' if n*r_each>=0 else ''}{n*r_each:.1f}R total"
+
+        breakdown = (
+            f"<b>What's driving the R total (full breakdown):</b>\n"
+            f"{bucket_line('TP2 full wins', full_wins, R_TP2)}\n"
+            f"{bucket_line('Trail partial (0.75R)', trail_wins, R_TRAIL_BE)}\n"
+            f"{bucket_line('Breakeven partial (0.5R)', notrail_wins, R_BE)}\n"
+            f"{bucket_line('SL losses', sl_losses, R_SL)}\n\n"
+        )
+
         summary = (
-            f"<b>🔬 Backtest Results v4</b>  (structure stops, trailing tier, correlation + volatility tagging)\n\n"
+            f"<b>🔬 Backtest Results v5</b>  (Gold-focused, TP2-vs-partial breakdown)\n\n"
             f"Total trades: {len(all_trades)}\n"
             f"Wins: {wins}  ·  Losses: {losses}\n"
             f"Win rate: {win_rate:.0f}%\n"
             f"Total R: {'+' if total_r>=0 else ''}{total_r:.2f}\n"
             f"Avg R/trade: {'+' if avg_r>=0 else ''}{avg_r:.2f}\n\n"
             f"{top_line}"
+            f"{breakdown}"
             f"<b>Does the risk-flag system actually work?</b>\n"
             f"No flags: {stats_for(clean_trades)}\n"
             f"Any flag: {stats_for(flagged_trades)}\n"
