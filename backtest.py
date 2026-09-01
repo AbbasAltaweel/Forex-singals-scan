@@ -322,6 +322,41 @@ def main():
         r = sum(t["r"] for t in subset)
         return f"{len(subset)} trades, {w/len(subset)*100:.0f}% win rate, {'+' if r>=0 else ''}{r:.1f}R"
 
+    def profit_factor(trades):
+        gains = sum(t["r"] for t in trades if t["r"] > 0)
+        losses = abs(sum(t["r"] for t in trades if t["r"] < 0))
+        if losses == 0:
+            return float("inf") if gains > 0 else 0.0
+        return gains / losses
+
+    def max_drawdown(trades):
+        """Trades are already in chronological close order. Returns
+        (max_dd, trade_index_of_trough) in R terms."""
+        peak = 0.0
+        cum = 0.0
+        max_dd = 0.0
+        dd_index = 0
+        for idx, t in enumerate(trades):
+            cum += t["r"]
+            if cum > peak:
+                peak = cum
+            dd = peak - cum
+            if dd > max_dd:
+                max_dd = dd
+                dd_index = idx + 1
+        return max_dd, dd_index
+
+    def split_period_stats(trades):
+        if len(trades) < 10:
+            return None
+        mid = len(trades) // 2
+        first, second = trades[:mid], trades[mid:]
+        r1, r2 = sum(t["r"] for t in first), sum(t["r"] for t in second)
+        return (
+            f"First half: {len(first)} trades, {'+' if r1>=0 else ''}{r1:.1f}R\n"
+            f"Second half: {len(second)} trades, {'+' if r2>=0 else ''}{r2:.1f}R"
+        )
+
     clean_trades = [t for t in all_trades if not t["flags"]]
     flagged_trades = [t for t in all_trades if t["flags"]]
     corr_trades = [t for t in all_trades if "correlated" in t["flags"]]
@@ -376,8 +411,21 @@ def main():
             f"{bucket_line('SL losses', sl_losses, R_SL)}\n\n"
         )
 
+        pf = profit_factor(all_trades)
+        pf_str = "∞ (no losses)" if pf == float("inf") else f"{pf:.2f}"
+        dd, dd_idx = max_drawdown(all_trades)
+        split = split_period_stats(all_trades)
+        split_block = f"<b>Consistency check (first half vs second half):</b>\n{split}\n\n" if split else ""
+
+        quality_block = (
+            f"<b>Quality metrics:</b>\n"
+            f"Profit Factor: {pf_str}  <i>(above 1.5 solid, above 2.0 strong)</i>\n"
+            f"Max Drawdown: -{dd:.1f}R  <i>(around trade #{dd_idx} of {len(all_trades)})</i>\n\n"
+            f"{split_block}"
+        )
+
         summary = (
-            f"<b>🔬 Backtest Results v5</b>  (Gold-focused, TP2-vs-partial breakdown)\n\n"
+            f"<b>🔬 Backtest Results v6</b>  (Gold-focused, quality metrics)\n\n"
             f"Total trades: {len(all_trades)}\n"
             f"Wins: {wins}  ·  Losses: {losses}\n"
             f"Win rate: {win_rate:.0f}%\n"
@@ -385,6 +433,7 @@ def main():
             f"Avg R/trade: {'+' if avg_r>=0 else ''}{avg_r:.2f}\n\n"
             f"{top_line}"
             f"{breakdown}"
+            f"{quality_block}"
             f"<b>Does the risk-flag system actually work?</b>\n"
             f"No flags: {stats_for(clean_trades)}\n"
             f"Any flag: {stats_for(flagged_trades)}\n"
