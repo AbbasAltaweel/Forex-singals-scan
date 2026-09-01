@@ -241,9 +241,9 @@ def build_signal(highs, lows, closes):
     }
 
 
-def fetch_ohlc(symbol, api_key):
+def fetch_ohlc(symbol, api_key, interval="1h", outputsize=100):
     url = "https://api.twelvedata.com/time_series"
-    params = {"symbol": symbol, "interval": "1h", "outputsize": 100, "apikey": api_key}
+    params = {"symbol": symbol, "interval": interval, "outputsize": outputsize, "apikey": api_key}
     r = requests.get(url, params=params, timeout=20)
     data = r.json()
     if data.get("status") == "error" or "code" in data:
@@ -255,6 +255,39 @@ def fetch_ohlc(symbol, api_key):
     lows = [float(v["low"]) for v in values]
     closes = [float(v["close"]) for v in values]
     return highs, lows, closes
+
+
+def daily_trend_direction(symbol, api_key):
+    """Simple daily-timeframe trend check: price vs its 20-day SMA.
+    Returns 'buy', 'sell', or None if data is insufficient or inconclusive.
+    Failures here are non-fatal -- the filter just won't tag anything."""
+    try:
+        _, _, closes = fetch_ohlc(symbol, api_key, interval="1day", outputsize=30)
+        s20 = sma(closes, 20)
+        if not s20:
+            return None
+        price = closes[-1]
+        if price > s20 * 1.001:
+            return "buy"
+        if price < s20 * 0.999:
+            return "sell"
+        return None
+    except Exception as e:
+        print(f"Daily trend check failed for {symbol} (non-fatal): {e}", file=sys.stderr)
+        return None
+
+
+def get_cached_daily_trend(symbol, api_key, state):
+    """Daily trend barely changes within a day, so we cache it and only
+    refetch once per calendar day per pair -- keeps API usage sane."""
+    cache = state.setdefault("daily_trend_cache", {})
+    today = datetime.date.today().isoformat()
+    entry = cache.get(symbol)
+    if entry and entry.get("date") == today:
+        return entry.get("trend")
+    trend = daily_trend_direction(symbol, api_key)
+    cache[symbol] = {"trend": trend, "date": today}
+    return trend
 
 
 PAIR_CURRENCIES = {
@@ -313,6 +346,21 @@ def is_holiday_today(events, pair_symbol, now_utc):
         if e["dt"].date() == today:
             return True, e["title"]
     return False, None
+
+
+def check_correlation(symbol, direction, open_trades):
+    """Flags if a new trade would duplicate currency exposure already open.
+    Same currency, same direction on the quote/base = doubling the same bet."""
+    my_currencies = PAIR_CURRENCIES.get(symbol, set())
+    overlaps = []
+    for open_symbol, t in open_trades.items():
+        if open_symbol == symbol:
+            continue
+        their_currencies = PAIR_CURRENCIES.get(open_symbol, set())
+        shared = my_currencies & their_currencies
+        if shared and t["direction"] == direction:
+            overlaps.append((t["label"], shared))
+    return overlaps
 
 
 def send_telegram(token, chat_id, text, reply_to=None):
@@ -433,12 +481,13 @@ def load_state():
                 data.setdefault("friday_notice_date", None)
                 data.setdefault("sunday_prep_date", None)
                 data.setdefault("telegram_offset", None)
+                data.setdefault("daily_trend_cache", {})
                 return data
         except Exception:
             pass
     return {"trades": {}, "closed": [], "last_summary_date": None, "last_heartbeat": 0,
             "session_notices": {}, "friday_notice_date": None, "sunday_prep_date": None,
-            "telegram_offset": None}
+            "telegram_offset": None, "daily_trend_cache": {}}
 
 
 def save_state(state):
@@ -648,7 +697,6 @@ def main():
                         del trades[symbol]
                 else:
                     # only take new trades on top-ranked pairs (falls back to
-                    # all pairs if no backtest ranking has been generated yet)
                     # only take new trades on top-ranked pairs (falls back to
                     # all pairs if no backtest ranking has been generated yet)
                     eligible = (not top_pairs) or (symbol in top_pairs)
@@ -666,6 +714,16 @@ def main():
                         risk_flags.append(f"volatility spike (ATR &gt; {VOLATILITY_SPIKE_MULTIPLIER}x its 50-period average)")
 
                     sig = build_signal(highs, lows, closes)
+
+                    if eligible and sig["direction"]:
+                        overlaps = check_correlation(symbol, sig["direction"], trades)
+                        for their_label, shared in overlaps:
+                            risk_flags.append(f"correlated with open {their_label} trade (shares {'/'.join(shared)} exposure)")
+
+                        daily_trend = get_cached_daily_trend(symbol, api_key, state)
+                        if daily_trend and daily_trend != sig["direction"]:
+                            risk_flags.append(f"counter-trend on daily chart (daily bias: {daily_trend.upper()})")
+
                     if eligible and sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                         p = sig["plan"]
                         trade = {
