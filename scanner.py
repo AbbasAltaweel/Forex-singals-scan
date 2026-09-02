@@ -149,6 +149,25 @@ def is_volatility_spike(highs, lows, closes):
     return current_atr > baseline_atr * VOLATILITY_SPIKE_MULTIPLIER
 
 
+EXTREME_MOVE_PCT_THRESHOLD = 2.0  # % raw price change over last 24h considered a shock
+
+
+def is_extreme_move(closes, lookback_hours=24):
+    """Raw price-based shock detector, complementing the smoothed ATR spike
+    check -- catches fast, large moves (news-driven or otherwise) even when
+    ATR hasn't fully caught up yet, and regardless of whether the cause was
+    a scheduled event or something no calendar could have predicted (e.g. a
+    geopolitical shock)."""
+    if len(closes) < lookback_hours + 1:
+        return False, 0.0
+    old_price = closes[-(lookback_hours + 1)]
+    new_price = closes[-1]
+    if old_price == 0:
+        return False, 0.0
+    pct_change = abs(new_price - old_price) / old_price * 100
+    return pct_change > EXTREME_MOVE_PCT_THRESHOLD, pct_change
+
+
 def build_signal(highs, lows, closes):
     price = closes[-1]
     sma20, sma50 = sma(closes, 20), sma(closes, 50)
@@ -322,7 +341,12 @@ PAIR_CURRENCIES = {
     "USD/CHF": {"USD", "CHF"}, "AUD/USD": {"AUD", "USD"}, "USD/CAD": {"USD", "CAD"},
     "NZD/USD": {"NZD", "USD"}, "XAU/USD": {"USD"},
 }
-NEWS_BUFFER_MINUTES = 45  # skip new trades within this window of a high-impact release
+NEWS_BUFFER_MINUTES = 45  # standard high-impact events
+MAJOR_EVENT_BUFFER_MINUTES = 360  # Fed Chair speeches, FOMC, NFP -- these ripple for hours, not minutes
+MAJOR_EVENT_KEYWORDS = [
+    "fed chair", "fomc", "non-farm", "nonfarm", "nfp", "powell", "warsh",
+    "interest rate decision", "press conference", "jackson hole",
+]
 FF_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 
 
@@ -358,8 +382,11 @@ def is_near_high_impact_news(events, pair_symbol, now_utc):
     for e in events:
         if e["impact"] != "High" or e["currency"] not in currencies:
             continue
+        title_lower = e["title"].lower()
+        is_major = any(kw in title_lower for kw in MAJOR_EVENT_KEYWORDS)
+        buffer_minutes = MAJOR_EVENT_BUFFER_MINUTES if is_major else NEWS_BUFFER_MINUTES
         delta_minutes = abs((now_utc - e["dt"]).total_seconds()) / 60
-        if delta_minutes <= NEWS_BUFFER_MINUTES:
+        if delta_minutes <= buffer_minutes:
             return True, e["title"], e["dt"]
     return False, None, None
 
@@ -725,13 +752,13 @@ def main():
                         del trades[symbol]
                 else:
                     # only take new trades on top-ranked pairs (falls back to
-                    # only take new trades on top-ranked pairs (falls back to
                     # all pairs if no backtest ranking has been generated yet)
                     eligible = (not top_pairs) or (symbol in top_pairs)
                     now_utc = datetime.datetime.now(datetime.timezone.utc)
                     near_news, news_name, news_time = is_near_high_impact_news(news_events, symbol, now_utc)
                     on_holiday, holiday_name = is_holiday_today(news_events, symbol, now_utc)
                     vol_spike = is_volatility_spike(highs, lows, closes)
+                    extreme_move, move_pct = is_extreme_move(closes)
 
                     risk_flags = []
                     if near_news:
@@ -740,6 +767,8 @@ def main():
                         risk_flags.append(f"{holiday_name} — thin holiday liquidity")
                     if vol_spike:
                         risk_flags.append(f"volatility spike (ATR &gt; {VOLATILITY_SPIKE_MULTIPLIER}x its 50-period average)")
+                    if extreme_move:
+                        risk_flags.append(f"large recent move ({move_pct:.1f}% over last 24h) — possible shock/regime change, scheduled or not")
 
                     sig = build_signal(highs, lows, closes)
 
