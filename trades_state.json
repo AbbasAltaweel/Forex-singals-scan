@@ -13,21 +13,6 @@
       "risk_dist": 0.002453441632544795,
       "signal_message_id": 177
     },
-    "XAU/USD": {
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4377.75926,
-      "sl": 4429.163486370793,
-      "tp1": 4326.355033629206,
-      "tp2": 4274.950807258414,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1788253071,
-      "risk_dist": 51.40422637079337,
-      "signal_message_id": 203,
-      "effective_sl": 4339.206090221905,
-      "trail_hit": true
-    },
     "USD/CHF": {
       "label": "USD/CHF",
       "direction": "buy",
@@ -229,6 +214,15 @@
       "result": "breakeven",
       "r": 0.5,
       "closed_at": 1788272107,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1788351755,
       "user_taken": null
     }
   ],
