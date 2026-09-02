@@ -25,7 +25,8 @@
       "opened_at": 1788253071,
       "risk_dist": 51.40422637079337,
       "signal_message_id": 203,
-      "effective_sl": 4377.75926
+      "effective_sl": 4339.206090221905,
+      "trail_hit": true
     },
     "USD/CHF": {
       "label": "USD/CHF",
