@@ -285,13 +285,13 @@
   "daily_trend_cache": {
     "XAU/USD": {
       "trend": "sell",
-      "date": "2026-09-03"
+      "date": "2026-09-06"
     }
   },
   "h4_trend_cache": {
     "XAU/USD": {
-      "trend": "buy",
-      "bucket": "2026-09-03-12"
+      "trend": "sell",
+      "bucket": "2026-09-06-20"
     }
   }
 }
