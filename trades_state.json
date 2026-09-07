@@ -320,7 +320,8 @@
     "New York_2026-09-06": true,
     "Tokyo_2026-09-06": true,
     "London_2026-09-07": true,
-    "New York_2026-09-07": true
+    "New York_2026-09-07": true,
+    "Sydney_2026-09-07": true
   },
   "friday_notice_date": "2026-09-04",
   "sunday_prep_date": "2026-09-06",
