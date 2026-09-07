@@ -244,7 +244,7 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-09-06",
+  "last_summary_date": "2026-09-07",
   "last_heartbeat": 1788728433,
   "session_notices": {
     "London_2026-08-27": true,
@@ -286,13 +286,13 @@
   "daily_trend_cache": {
     "XAU/USD": {
       "trend": "sell",
-      "date": "2026-09-06"
+      "date": "2026-09-07"
     }
   },
   "h4_trend_cache": {
     "XAU/USD": {
       "trend": "sell",
-      "bucket": "2026-09-06-20"
+      "bucket": "2026-09-07-0"
     }
   }
 }
