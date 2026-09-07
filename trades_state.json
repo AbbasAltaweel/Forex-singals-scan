@@ -78,6 +78,19 @@
       "opened_at": 1788275729,
       "risk_dist": 0.0029044793465624608,
       "signal_message_id": 216
+    },
+    "XAU/USD": {
+      "label": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "entry": 4415.43609,
+      "sl": 4433.546066717486,
+      "tp1": 4397.326113282515,
+      "tp2": 4379.216136565029,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1788749659,
+      "risk_dist": 18.10997671748555,
+      "signal_message_id": 264
     }
   },
   "closed": [
