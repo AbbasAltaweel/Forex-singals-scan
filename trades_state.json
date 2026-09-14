@@ -78,6 +78,19 @@
       "opened_at": 1788275729,
       "risk_dist": 0.0029044793465624608,
       "signal_message_id": 216
+    },
+    "XAU/USD": {
+      "label": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "entry": 4284.6843,
+      "sl": 4318.118509139691,
+      "tp1": 4251.250090860309,
+      "tp2": 4217.815881720617,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1789379032,
+      "risk_dist": 33.43420913969112,
+      "signal_message_id": 338
     }
   },
   "closed": [
@@ -414,7 +427,7 @@
   "h4_trend_cache": {
     "XAU/USD": {
       "trend": "sell",
-      "bucket": "2026-09-14-4"
+      "bucket": "2026-09-14-8"
     }
   }
 }
