@@ -91,7 +91,8 @@
       "opened_at": 1789364716,
       "risk_dist": 23.33692748865633,
       "signal_message_id": 333,
-      "effective_sl": 4329.2888
+      "effective_sl": 4311.786104383508,
+      "trail_hit": true
     }
   },
   "closed": [
