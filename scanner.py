@@ -550,12 +550,31 @@ def save_state(state):
         json.dump(state, f, indent=2)
 
 
+MAX_TRADE_AGE_SECONDS = 7 * 24 * 60 * 60  # auto-close swing trades that haven't resolved in a week
+NO_TIME_LIMIT_SYMBOLS = {"XAU/USD"}  # Gold runs to TP2/SL naturally, no forced close
+
+
 def check_open_trade(trade, highs, lows, closes, d):
     last_high, last_low = highs[-1], lows[-1]
     direction = trade["direction"]
     entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
     pair_label = trade["label"]
     risk_dist = trade.get("risk_dist", abs(entry - sl))
+
+    # 7-day auto-close: if the thesis hasn't resolved by now, stop tying up
+    # attention on it -- close at the current market price and move on.
+    # Exempt for symbols in NO_TIME_LIMIT_SYMBOLS (e.g. Gold), which run to
+    # TP2/SL naturally with no forced deadline.
+    age_seconds = int(time.time()) - trade.get("opened_at", int(time.time()))
+    if trade.get("symbol") not in NO_TIME_LIMIT_SYMBOLS and age_seconds >= MAX_TRADE_AGE_SECONDS:
+        current_price = closes[-1]
+        real_r = ((current_price - entry) / risk_dist) if direction == "buy" else ((entry - current_price) / risk_dist)
+        real_r = round(real_r, 2)
+        msg = (f"⏰ <b>{pair_label}</b> — 7-day auto-close\n"
+               f"Held a full week without resolving. Closing at market "
+               f"(<code>{current_price:.{d}f}</code>) rather than holding indefinitely. "
+               f"<i>Result: {'+' if real_r>=0 else ''}{real_r}R</i>")
+        return msg, trade, False, ("time_exit", real_r)
 
     if not trade.get("tp1_hit"):
         if direction == "buy":
@@ -677,6 +696,12 @@ def main():
     trades = state["trades"]
     closed_history = state["closed"]
     top_pairs, best_pair = load_top_pairs()
+
+    # backward-compat: trades opened before the "symbol" field existed won't
+    # have it stored -- backfill from the dict key so per-symbol rules (like
+    # Gold's no-time-limit exemption) apply correctly to existing trades too
+    for sym, t in trades.items():
+        t.setdefault("symbol", sym)
     news_events = fetch_ff_calendar()  # free, no key needed
 
     # check for replies to past signal messages (e.g. "took it" / "skip")
@@ -728,7 +753,16 @@ def main():
                 session_blocks.append(f"<b>🌍 {name} session opening</b>\n{desc}")
                 state["session_notices"][key] = True
 
-        for symbol, label in PAIRS:
+        pairs_dict = dict(PAIRS)
+        active_pair_symbols = set(pairs_dict.keys())
+        # union of currently-scanned pairs and any already-open trade, even on
+        # a pair no longer in PAIRS -- fixes a real bug where narrowing PAIRS
+        # orphaned existing trades on the dropped pairs, leaving them stuck
+        # forever since they were never checked again
+        symbols_to_check = active_pair_symbols | set(trades.keys())
+
+        for symbol in symbols_to_check:
+            label = pairs_dict.get(symbol) or trades.get(symbol, {}).get("label", symbol)
             try:
                 highs, lows, closes = fetch_ohlc(symbol, api_key)
                 d = decimals_for(symbol)
@@ -750,7 +784,7 @@ def main():
                         }
                         closed_history.append(record)
                         del trades[symbol]
-                else:
+                elif symbol in active_pair_symbols:
                     # only take new trades on top-ranked pairs (falls back to
                     # all pairs if no backtest ranking has been generated yet)
                     eligible = (not top_pairs) or (symbol in top_pairs)
@@ -788,7 +822,7 @@ def main():
                     if eligible and sig["direction"] and sig["plan"] and sig["trade_type"] == "Swing":
                         p = sig["plan"]
                         trade = {
-                            "label": label, "direction": sig["direction"],
+                            "symbol": symbol, "label": label, "direction": sig["direction"],
                             "entry": p["entry"], "sl": p["sl"], "tp1": p["tp1"], "tp2": p["tp2"],
                             "tp1_hit": False, "trade_type": sig["trade_type"],
                             "opened_at": int(time.time()),
