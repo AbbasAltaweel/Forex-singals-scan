@@ -1,84 +1,5 @@
 {
   "trades": {
-    "EUR/USD": {
-      "label": "EUR/USD",
-      "direction": "buy",
-      "entry": 1.16013,
-      "sl": 1.1576765583674553,
-      "tp1": 1.162583441632545,
-      "tp2": 1.1650368832650897,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788170836,
-      "risk_dist": 0.002453441632544795,
-      "signal_message_id": 177
-    },
-    "USD/CHF": {
-      "label": "USD/CHF",
-      "direction": "buy",
-      "entry": 0.80991,
-      "sl": 0.8078065054885792,
-      "tp1": 0.8120134945114208,
-      "tp2": 0.8141169890228416,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1788254140,
-      "risk_dist": 0.002103494511420778,
-      "signal_message_id": 204,
-      "effective_sl": 0.80991
-    },
-    "AUD/USD": {
-      "label": "AUD/USD",
-      "direction": "sell",
-      "entry": 0.71441,
-      "sl": 0.7164389038122744,
-      "tp1": 0.7123810961877256,
-      "tp2": 0.7103521923754512,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788261416,
-      "risk_dist": 0.002028903812274385,
-      "signal_message_id": 205
-    },
-    "USD/JPY": {
-      "label": "USD/JPY",
-      "direction": "buy",
-      "entry": 159.99708,
-      "sl": 159.6684216308332,
-      "tp1": 160.32573836916683,
-      "tp2": 160.65439673833367,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788272077,
-      "risk_dist": 0.328658369166817,
-      "signal_message_id": 210
-    },
-    "NZD/USD": {
-      "label": "NZD/USD",
-      "direction": "sell",
-      "entry": 0.59073,
-      "sl": 0.5928306682873185,
-      "tp1": 0.5886293317126815,
-      "tp2": 0.586528663425363,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788273075,
-      "risk_dist": 0.0021006682873184745,
-      "signal_message_id": 214
-    },
-    "GBP/USD": {
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.35333,
-      "sl": 1.3562344793465624,
-      "tp1": 1.3504255206534375,
-      "tp2": 1.347521041306875,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1788275729,
-      "risk_dist": 0.0029044793465624608,
-      "signal_message_id": 216
-    },
     "XAU/USD": {
       "label": "GOLD (XAU/USD)",
       "direction": "buy",
@@ -91,7 +12,8 @@
       "opened_at": 1789625717,
       "risk_dist": 60.694172009701106,
       "signal_message_id": 366,
-      "effective_sl": 4311.72886
+      "effective_sl": 4311.72886,
+      "symbol": "XAU/USD"
     }
   },
   "closed": [
@@ -372,6 +294,60 @@
       "result": "sl",
       "r": -1.0,
       "closed_at": 1789584316,
+      "user_taken": null
+    },
+    {
+      "pair": "USD/JPY",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": -6.31,
+      "closed_at": 1789733724,
+      "user_taken": null
+    },
+    {
+      "pair": "EUR/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": -5.79,
+      "closed_at": 1789733731,
+      "user_taken": null
+    },
+    {
+      "pair": "AUD/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": 1.35,
+      "closed_at": 1789733738,
+      "user_taken": null
+    },
+    {
+      "pair": "USD/CHF",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": 7.54,
+      "closed_at": 1789733745,
+      "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": 6.51,
+      "closed_at": 1789733752,
+      "user_taken": null
+    },
+    {
+      "pair": "NZD/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": 9.49,
+      "closed_at": 1789733760,
       "user_taken": null
     }
   ],
