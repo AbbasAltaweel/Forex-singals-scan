@@ -351,8 +351,8 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-09-18",
-  "last_heartbeat": 1789740923,
+  "last_summary_date": "2026-09-20",
+  "last_heartbeat": 1789938025,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -425,7 +425,10 @@
     "Sydney_2026-09-17": true,
     "Tokyo_2026-09-17": true,
     "London_2026-09-18": true,
-    "New York_2026-09-18": true
+    "New York_2026-09-18": true,
+    "Sydney_2026-09-20": true,
+    "London_2026-09-20": true,
+    "New York_2026-09-20": true
   },
   "friday_notice_date": "2026-09-18",
   "sunday_prep_date": "2026-09-20",
