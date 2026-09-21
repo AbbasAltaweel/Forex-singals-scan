@@ -43,6 +43,8 @@ SESSION_OPENS = [
 
 PAIRS = [
     ("XAU/USD", "GOLD (XAU/USD)"),
+    ("USD/CAD", "USD/CAD"),
+    ("GBP/USD", "GBP/USD"),
 ]
 
 STATE_FILE = "trades_state.json"
@@ -551,7 +553,19 @@ def save_state(state):
 
 
 MAX_TRADE_AGE_SECONDS = 7 * 24 * 60 * 60  # auto-close swing trades that haven't resolved in a week
-NO_TIME_LIMIT_SYMBOLS = {"XAU/USD"}  # Gold runs to TP2/SL naturally, no forced close
+GOLD_SYMBOLS = {"XAU/USD"}  # Gold gets its own short same-day/next-day window instead of the 7-day rule
+
+
+def _gold_deadline_passed(opened_at_ts):
+    """Gold-specific rule: if TP2 hasn't hit by the end of the day AFTER the
+    trade opened (local Eastern time), reset it and free the slot for a new
+    opportunity. 'Same day or the following day' == opened_day + 1, so the
+    deadline is midnight at the *start* of opened_day + 2."""
+    opened_dt = datetime.datetime.fromtimestamp(opened_at_ts, tz=TZ)
+    opened_day = opened_dt.date()
+    deadline_date = opened_day + datetime.timedelta(days=2)
+    deadline_dt = datetime.datetime.combine(deadline_date, datetime.time(0, 0), tzinfo=TZ)
+    return now_local() >= deadline_dt
 
 
 def check_open_trade(trade, highs, lows, closes, d):
@@ -560,19 +574,30 @@ def check_open_trade(trade, highs, lows, closes, d):
     entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
     pair_label = trade["label"]
     risk_dist = trade.get("risk_dist", abs(entry - sl))
+    symbol = trade.get("symbol")
 
-    # 7-day auto-close: if the thesis hasn't resolved by now, stop tying up
-    # attention on it -- close at the current market price and move on.
-    # Exempt for symbols in NO_TIME_LIMIT_SYMBOLS (e.g. Gold), which run to
-    # TP2/SL naturally with no forced deadline.
-    age_seconds = int(time.time()) - trade.get("opened_at", int(time.time()))
-    if trade.get("symbol") not in NO_TIME_LIMIT_SYMBOLS and age_seconds >= MAX_TRADE_AGE_SECONDS:
+    opened_at = trade.get("opened_at", int(time.time()))
+    age_seconds = int(time.time()) - opened_at
+
+    if symbol in GOLD_SYMBOLS:
+        # Gold: reset if TP2 hasn't hit by the same day or the following day.
+        time_exit_due = _gold_deadline_passed(opened_at)
+        exit_label = "Gold same-day/next-day auto-close"
+        exit_note = ("Didn't reach TP2 by the day after opening. Closing at market "
+                     "and freeing this slot for a fresh opportunity.")
+    else:
+        # Other pairs: general 7-day auto-close.
+        time_exit_due = age_seconds >= MAX_TRADE_AGE_SECONDS
+        exit_label = "7-day auto-close"
+        exit_note = ("Held a full week without resolving. Closing at market "
+                     "rather than holding indefinitely.")
+
+    if time_exit_due:
         current_price = closes[-1]
         real_r = ((current_price - entry) / risk_dist) if direction == "buy" else ((entry - current_price) / risk_dist)
         real_r = round(real_r, 2)
-        msg = (f"⏰ <b>{pair_label}</b> — 7-day auto-close\n"
-               f"Held a full week without resolving. Closing at market "
-               f"(<code>{current_price:.{d}f}</code>) rather than holding indefinitely. "
+        msg = (f"⏰ <b>{pair_label}</b> — {exit_label}\n"
+               f"{exit_note} Closed at (<code>{current_price:.{d}f}</code>). "
                f"<i>Result: {'+' if real_r>=0 else ''}{real_r}R</i>")
         return msg, trade, False, ("time_exit", real_r)
 
