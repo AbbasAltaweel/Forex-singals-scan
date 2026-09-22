@@ -13,7 +13,8 @@
       "opened_at": 1790006420,
       "risk_dist": 37.95188533667624,
       "signal_message_id": 388,
-      "effective_sl": 4347.73345
+      "effective_sl": 4319.269535997492,
+      "trail_hit": true
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
