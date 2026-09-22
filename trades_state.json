@@ -8,11 +8,12 @@
       "sl": 1.3379839094838806,
       "tp1": 1.3324760905161193,
       "tp2": 1.3297221810322388,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1790064932,
       "risk_dist": 0.0027539094838806566,
-      "signal_message_id": 395
+      "signal_message_id": 395,
+      "effective_sl": 1.33523
     },
     "XAU/USD": {
       "symbol": "XAU/USD",
