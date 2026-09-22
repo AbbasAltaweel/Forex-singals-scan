@@ -359,7 +359,7 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-09-21",
+  "last_summary_date": "2026-09-22",
   "last_heartbeat": 1790024440,
   "session_notices": {
     "London_2026-08-27": true,
@@ -453,11 +453,11 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-09-21"
+      "date": "2026-09-22"
     },
     "GBP/USD": {
       "trend": "sell",
-      "date": "2026-09-21"
+      "date": "2026-09-22"
     }
   },
   "h4_trend_cache": {
@@ -467,11 +467,11 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "bucket": "2026-09-21-20"
+      "bucket": "2026-09-22-0"
     },
     "GBP/USD": {
       "trend": "sell",
-      "bucket": "2026-09-21-20"
+      "bucket": "2026-09-22-0"
     }
   }
 }
