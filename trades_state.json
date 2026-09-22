@@ -15,20 +15,6 @@
       "signal_message_id": 395,
       "effective_sl": 1.33523
     },
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4318.69733,
-      "sl": 4368.539856506035,
-      "tp1": 4268.854803493965,
-      "tp2": 4219.012276987929,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1790068523,
-      "risk_dist": 49.84252650603503,
-      "signal_message_id": 398
-    },
     "USD/CAD": {
       "symbol": "USD/CAD",
       "label": "USD/CAD",
@@ -394,6 +380,15 @@
       "result": "breakeven",
       "r": 0.75,
       "closed_at": 1790067622,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1790106329,
       "user_taken": null
     }
   ],
