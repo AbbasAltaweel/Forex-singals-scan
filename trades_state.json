@@ -383,7 +383,7 @@
     }
   ],
   "last_summary_date": "2026-09-22",
-  "last_heartbeat": 1790053244,
+  "last_heartbeat": 1790082046,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -492,7 +492,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "bucket": "2026-09-22-0"
+      "bucket": "2026-09-22-12"
     },
     "GBP/USD": {
       "trend": "sell",
