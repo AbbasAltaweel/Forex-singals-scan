@@ -27,6 +27,20 @@
       "opened_at": 1790068523,
       "risk_dist": 49.84252650603503,
       "signal_message_id": 398
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.40585,
+      "sl": 1.4030102209933892,
+      "tp1": 1.4086897790066109,
+      "tp2": 1.4115295580132217,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1790087425,
+      "risk_dist": 0.0028397790066108097,
+      "signal_message_id": 401
     }
   },
   "closed": [
