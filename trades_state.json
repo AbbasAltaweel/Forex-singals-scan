@@ -14,6 +14,20 @@
       "risk_dist": 37.95188533667624,
       "signal_message_id": 388,
       "effective_sl": 4347.73345
+    },
+    "GBP/USD": {
+      "symbol": "GBP/USD",
+      "label": "GBP/USD",
+      "direction": "sell",
+      "entry": 1.33523,
+      "sl": 1.3379839094838806,
+      "tp1": 1.3324760905161193,
+      "tp2": 1.3297221810322388,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1790064932,
+      "risk_dist": 0.0027539094838806566,
+      "signal_message_id": 395
     }
   },
   "closed": [
@@ -473,7 +487,7 @@
     },
     "GBP/USD": {
       "trend": "sell",
-      "bucket": "2026-09-22-0"
+      "bucket": "2026-09-22-8"
     }
   }
 }
