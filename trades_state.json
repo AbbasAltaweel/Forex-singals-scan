@@ -1,21 +1,5 @@
 {
   "trades": {
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4347.73345,
-      "sl": 4385.685335336676,
-      "tp1": 4309.7815646633235,
-      "tp2": 4271.829679326647,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1790006420,
-      "risk_dist": 37.95188533667624,
-      "signal_message_id": 388,
-      "effective_sl": 4319.269535997492,
-      "trail_hit": true
-    },
     "GBP/USD": {
       "symbol": "GBP/USD",
       "label": "GBP/USD",
@@ -372,6 +356,15 @@
       "result": "time_exit",
       "r": 0.59,
       "closed_at": 1790006276,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1790067622,
       "user_taken": null
     }
   ],
