@@ -31,22 +31,6 @@
       "signal_message_id": 408,
       "effective_sl": 4312.456588985546,
       "trail_hit": true
-    },
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.33076,
-      "sl": 1.3340042604853493,
-      "tp1": 1.3275157395146506,
-      "tp2": 1.3242714790293013,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1790153119,
-      "risk_dist": 0.003244260485349315,
-      "signal_message_id": 413,
-      "effective_sl": 1.328326804635988,
-      "trail_hit": true
     }
   },
   "closed": [
@@ -417,6 +401,15 @@
       "result": "tp2",
       "r": 2.0,
       "closed_at": 1790152231,
+      "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "tp2",
+      "r": 2.0,
+      "closed_at": 1790182828,
       "user_taken": null
     }
   ],
