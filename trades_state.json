@@ -13,7 +13,8 @@
       "opened_at": 1790087425,
       "risk_dist": 0.0028397790066108097,
       "signal_message_id": 401,
-      "effective_sl": 1.40585
+      "effective_sl": 1.407979834254958,
+      "trail_hit": true
     },
     "XAU/USD": {
       "symbol": "XAU/USD",
