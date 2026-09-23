@@ -13,7 +13,8 @@
       "opened_at": 1790064932,
       "risk_dist": 0.0027539094838806566,
       "signal_message_id": 395,
-      "effective_sl": 1.33523
+      "effective_sl": 1.3331645678870894,
+      "trail_hit": true
     },
     "USD/CAD": {
       "symbol": "USD/CAD",
@@ -23,11 +24,12 @@
       "sl": 1.4030102209933892,
       "tp1": 1.4086897790066109,
       "tp2": 1.4115295580132217,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1790087425,
       "risk_dist": 0.0028397790066108097,
-      "signal_message_id": 401
+      "signal_message_id": 401,
+      "effective_sl": 1.40585
     },
     "XAU/USD": {
       "symbol": "XAU/USD",
