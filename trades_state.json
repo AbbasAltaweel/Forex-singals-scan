@@ -28,7 +28,8 @@
       "opened_at": 1790133325,
       "risk_dist": 35.12098801927277,
       "signal_message_id": 408,
-      "effective_sl": 4338.79733
+      "effective_sl": 4312.456588985546,
+      "trail_hit": true
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
@@ -43,7 +44,8 @@
       "opened_at": 1790153119,
       "risk_dist": 0.003244260485349315,
       "signal_message_id": 413,
-      "effective_sl": 1.33076
+      "effective_sl": 1.328326804635988,
+      "trail_hit": true
     }
   },
   "closed": [
