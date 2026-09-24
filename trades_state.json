@@ -531,7 +531,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-09-22"
+      "date": "2026-09-24"
     },
     "GBP/USD": {
       "trend": "sell",
@@ -545,7 +545,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "bucket": "2026-09-22-12"
+      "bucket": "2026-09-24-12"
     },
     "GBP/USD": {
       "trend": "sell",
