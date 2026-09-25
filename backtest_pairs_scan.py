@@ -319,6 +319,19 @@ def profit_factor(trades):
     return gains / losses
 
 
+def split_period_consistency(trades):
+    """Splits a pair's trades (already in chronological close order) into
+    first half / second half and checks whether the edge holds in BOTH,
+    not just the total. Returns (r1, r2, consistent_bool)."""
+    if len(trades) < 15:
+        return None, None, False
+    mid = len(trades) // 2
+    r1 = sum(t["r"] for t in trades[:mid])
+    r2 = sum(t["r"] for t in trades[mid:])
+    consistent = r1 > 0 and r2 > 0
+    return r1, r2, consistent
+
+
 def main():
     api_key = os.environ["TWELVE_DATA_API_KEY"]
     tg_token = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -349,31 +362,47 @@ def main():
         wr = (wins / len(p_trades) * 100) if p_trades else 0
         total_r = sum(t["r"] for t in p_trades)
         pf = profit_factor(p_trades) if p_trades else 0.0
-        pair_stats.append((symbol, d["label"], len(p_trades), wr, total_r, pf))
+        r1, r2, consistent = split_period_consistency(p_trades)
+        pair_stats.append((symbol, d["label"], len(p_trades), wr, total_r, pf, r1, r2, consistent))
 
     # Only pairs with a meaningful sample get ranked; small samples are noise.
     ranked = sorted([p for p in pair_stats if p[2] >= 15], key=lambda p: p[4], reverse=True)
     unranked = sorted([p for p in pair_stats if p[2] < 15], key=lambda p: p[2], reverse=True)
 
-    positive = [p for p in ranked if p[4] > 0]
+    # Consistent = positive total AND positive in both halves of the window --
+    # the real bar for "worth adding to a live bot," not just a positive total.
+    confirmed = [p for p in ranked if p[4] > 0 and p[8]]
+    front_loaded = [p for p in ranked if p[4] > 0 and not p[8]]
     negative = [p for p in ranked if p[4] <= 0]
 
     lines = []
-    if positive:
-        lines.append("<b>✅ Positive edge (candidates to add):</b>")
-        for symbol, label, count, wr, total_r, pf in positive:
+    if confirmed:
+        lines.append("<b>✅ Positive AND consistent both halves (real candidates):</b>")
+        for symbol, label, count, wr, total_r, pf, r1, r2, consistent in confirmed:
             pf_str = "∞" if pf == float("inf") else f"{pf:.2f}"
-            lines.append(f"{label}: {count} trades, {wr:.0f}% WR, +{total_r:.1f}R, PF {pf_str}")
+            lines.append(
+                f"{label}: {count} trades, {wr:.0f}% WR, +{total_r:.1f}R, PF {pf_str} "
+                f"(1st half {'+' if r1>=0 else ''}{r1:.1f}R / 2nd half {'+' if r2>=0 else ''}{r2:.1f}R)"
+            )
+        lines.append("")
+    if front_loaded:
+        lines.append("<b>⚠️ Positive total but NOT consistent (one half carried it -- not trusted yet):</b>")
+        for symbol, label, count, wr, total_r, pf, r1, r2, consistent in front_loaded:
+            pf_str = "∞" if pf == float("inf") else f"{pf:.2f}"
+            lines.append(
+                f"{label}: {count} trades, {wr:.0f}% WR, +{total_r:.1f}R, PF {pf_str} "
+                f"(1st half {'+' if r1>=0 else ''}{r1:.1f}R / 2nd half {'+' if r2>=0 else ''}{r2:.1f}R)"
+            )
         lines.append("")
     if negative:
         lines.append("<b>❌ Negative over this window (not recommended):</b>")
-        for symbol, label, count, wr, total_r, pf in negative:
+        for symbol, label, count, wr, total_r, pf, r1, r2, consistent in negative:
             pf_str = "∞" if pf == float("inf") else f"{pf:.2f}"
             lines.append(f"{label}: {count} trades, {wr:.0f}% WR, {total_r:.1f}R, PF {pf_str}")
         lines.append("")
     if unranked:
-        lines.append("<b>⚠️ Too few trades to trust (sample &lt;15):</b>")
-        for symbol, label, count, wr, total_r, pf in unranked:
+        lines.append("<b>🔹 Too few trades to trust (sample &lt;15):</b>")
+        for symbol, label, count, wr, total_r, pf, r1, r2, consistent in unranked:
             lines.append(f"{label}: {count} trades, {'+' if total_r>=0 else ''}{total_r:.1f}R")
         lines.append("")
 
@@ -382,10 +411,12 @@ def main():
         f"<b>🔬 Pairs Scan Backtest</b> (cross/minor pairs, not the majors already tested)\n\n"
         f"Total trades across {len(data)} pairs: {total_trades}\n\n"
         + "\n".join(lines) +
-        f"\n<i>Scalp trades excluded. Spread cost subtracted. News/holiday filter and "
-        f"H4/Daily confirmation not included (same limitation as the main backtest). "
-        f"Past performance does not guarantee future results -- this is one historical "
-        f"window, treat it as evidence to weigh, not a verdict.</i>"
+        f"\n<i>Consistent = positive R in BOTH the first and second half of the window, "
+        f"not just the total -- a pair that only made money in one stretch is flagged, "
+        f"not counted as a real candidate. Scalp trades excluded, spread cost subtracted. "
+        f"News/holiday filter and H4/Daily confirmation not included (same limitation as "
+        f"the main backtest). Past performance does not guarantee future results -- this "
+        f"is one historical window, treat it as evidence to weigh, not a verdict.</i>"
     )
     if fetch_errors:
         summary += "\n\n<b>Fetch errors:</b>\n" + "\n".join(fetch_errors)
