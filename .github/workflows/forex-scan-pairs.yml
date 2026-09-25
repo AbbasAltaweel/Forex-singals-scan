@@ -1,0 +1,35 @@
+name: Forex Signal Scan - Pairs
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: forex-signal-scan-pairs
+  cancel-in-progress: false
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run scanner
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_PAIRS }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_PAIRS }}
+        run: python scanner_pairs.py
+      - name: Save trade state
+        run: |
+          git config user.name "forex-scanner-bot"
+          git config user.email "actions@github.com"
+          git add trades_state_pairs.json
+          git diff --staged --quiet || git commit -m "Update pairs trade state [skip ci]"
+          git push
