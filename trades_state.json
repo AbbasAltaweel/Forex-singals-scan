@@ -14,20 +14,6 @@
       "risk_dist": 0.004452399817133967,
       "signal_message_id": 420
     },
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4264.83977,
-      "sl": 4309.326364095889,
-      "tp1": 4220.35317590411,
-      "tp2": 4175.86658180822,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1790238623,
-      "risk_dist": 44.486594095889814,
-      "signal_message_id": 428
-    },
     "USD/CAD": {
       "symbol": "USD/CAD",
       "label": "USD/CAD",
@@ -438,6 +424,15 @@
       "result": "tp2",
       "r": 2.0,
       "closed_at": 1790246730,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1790332234,
       "user_taken": null
     }
   ],
