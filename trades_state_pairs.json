@@ -30,11 +30,14 @@
     }
   },
   "closed": [],
-  "last_summary_date": "2026-09-25",
-  "last_heartbeat": 1790364905,
+  "last_summary_date": "2026-09-27",
+  "last_heartbeat": 1790544580,
   "session_notices": {
     "London_2026-09-25": true,
-    "New York_2026-09-25": true
+    "New York_2026-09-25": true,
+    "Sydney_2026-09-27": true,
+    "London_2026-09-27": true,
+    "New York_2026-09-27": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": null,
