@@ -37,7 +37,8 @@
     "New York_2026-09-25": true,
     "Sydney_2026-09-27": true,
     "London_2026-09-27": true,
-    "New York_2026-09-27": true
+    "New York_2026-09-27": true,
+    "Tokyo_2026-09-27": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": null,
@@ -50,6 +51,10 @@
     "GBP/USD": {
       "trend": "sell",
       "date": "2026-09-25"
+    },
+    "USD/CAD": {
+      "trend": "buy",
+      "date": "2026-09-27"
     }
   },
   "h4_trend_cache": {
@@ -60,6 +65,10 @@
     "GBP/USD": {
       "trend": null,
       "bucket": "2026-09-25-16"
+    },
+    "USD/CAD": {
+      "trend": null,
+      "bucket": "2026-09-27-20"
     }
   }
 }
