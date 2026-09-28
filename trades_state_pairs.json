@@ -30,7 +30,7 @@
     }
   },
   "closed": [],
-  "last_summary_date": "2026-09-27",
+  "last_summary_date": "2026-09-28",
   "last_heartbeat": 1790544580,
   "session_notices": {
     "London_2026-09-25": true,
@@ -54,7 +54,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-09-27"
+      "date": "2026-09-28"
     }
   },
   "h4_trend_cache": {
@@ -68,7 +68,7 @@
     },
     "USD/CAD": {
       "trend": null,
-      "bucket": "2026-09-27-20"
+      "bucket": "2026-09-28-0"
     }
   }
 }
