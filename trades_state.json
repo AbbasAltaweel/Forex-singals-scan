@@ -36,11 +36,12 @@
       "sl": 4269.715139398893,
       "tp1": 4250.479800601106,
       "tp2": 4240.862131202212,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1790552916,
       "risk_dist": 9.617669398893668,
-      "signal_message_id": 448
+      "signal_message_id": 448,
+      "effective_sl": 4260.09747
     }
   },
   "closed": [
@@ -468,7 +469,7 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-09-27",
+  "last_summary_date": "2026-09-28",
   "last_heartbeat": 1790543220,
   "session_notices": {
     "London_2026-08-27": true,
