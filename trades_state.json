@@ -27,7 +27,8 @@
       "opened_at": 1790257530,
       "risk_dist": 0.002846807991632394,
       "signal_message_id": 431,
-      "effective_sl": 1.4136
+      "effective_sl": 1.4157351059937242,
+      "trail_hit": true
     }
   },
   "closed": [
@@ -465,7 +466,7 @@
     }
   ],
   "last_summary_date": "2026-09-29",
-  "last_heartbeat": 1790638317,
+  "last_heartbeat": 1790674564,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -568,7 +569,8 @@
     "London_2026-09-28": true,
     "New York_2026-09-28": true,
     "Sydney_2026-09-28": true,
-    "Tokyo_2026-09-28": true
+    "Tokyo_2026-09-28": true,
+    "London_2026-09-29": true
   },
   "friday_notice_date": "2026-09-25",
   "sunday_prep_date": "2026-09-27",
