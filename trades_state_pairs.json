@@ -14,20 +14,6 @@
       "risk_dist": 0.651742784580307,
       "signal_message_id": 16,
       "effective_sl": 110.0483
-    },
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.32288,
-      "sl": 1.3259994832249147,
-      "tp1": 1.3197605167750854,
-      "tp2": 1.3166410335501708,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1790711933,
-      "risk_dist": 0.003119483224914621,
-      "signal_message_id": 19
     }
   },
   "closed": [
@@ -48,10 +34,19 @@
       "r": -1.0,
       "closed_at": 1790694755,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1790757292,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-09-30",
-  "last_heartbeat": 1790724437,
+  "last_heartbeat": 1790757299,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -66,7 +61,8 @@
     "London_2026-09-29": true,
     "New York_2026-09-29": true,
     "Sydney_2026-09-29": true,
-    "Tokyo_2026-09-29": true
+    "Tokyo_2026-09-29": true,
+    "London_2026-09-30": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": null,
