@@ -1,19 +1,5 @@
 {
   "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.32359,
-      "sl": 1.328042399817134,
-      "tp1": 1.319137600182866,
-      "tp2": 1.3146852003657323,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1790182980,
-      "risk_dist": 0.004452399817133967,
-      "signal_message_id": 420
-    },
     "XAU/USD": {
       "symbol": "XAU/USD",
       "label": "GOLD (XAU/USD)",
@@ -470,6 +456,15 @@
       "r": 2.0,
       "closed_at": 1790698066,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1790767352,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-09-30",
@@ -580,7 +575,8 @@
     "London_2026-09-29": true,
     "New York_2026-09-29": true,
     "Sydney_2026-09-29": true,
-    "Tokyo_2026-09-29": true
+    "Tokyo_2026-09-29": true,
+    "London_2026-09-30": true
   },
   "friday_notice_date": "2026-09-25",
   "sunday_prep_date": "2026-09-27",
