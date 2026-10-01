@@ -1,37 +1,5 @@
 {
   "trades": {
-    "AUD/JPY": {
-      "symbol": "AUD/JPY",
-      "label": "AUD/JPY",
-      "direction": "sell",
-      "entry": 110.0483,
-      "sl": 110.7000427845803,
-      "tp1": 109.39655721541969,
-      "tp2": 108.74481443083938,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1790671596,
-      "risk_dist": 0.651742784580307,
-      "signal_message_id": 16,
-      "effective_sl": 109.55949291156477,
-      "trail_hit": true
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "buy",
-      "entry": 1.41987,
-      "sl": 1.4166597587574201,
-      "tp1": 1.4230802412425798,
-      "tp2": 1.4262904824851597,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1790781410,
-      "risk_dist": 0.0032102412425798477,
-      "signal_message_id": 24,
-      "effective_sl": 1.4222776809319349,
-      "trail_hit": true
-    },
     "GBP/USD": {
       "symbol": "GBP/USD",
       "label": "GBP/USD",
@@ -83,10 +51,28 @@
       "r": -1.0,
       "closed_at": 1790847953,
       "user_taken": null
+    },
+    {
+      "pair": "AUD/JPY",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1790890209,
+      "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1790890223,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-01",
-  "last_heartbeat": 1790847960,
+  "last_heartbeat": 1790890230,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -107,7 +93,8 @@
     "Sydney_2026-09-30": true,
     "Tokyo_2026-09-30": true,
     "London_2026-10-01": true,
-    "New York_2026-10-01": true
+    "New York_2026-10-01": true,
+    "Sydney_2026-10-01": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": null,
