@@ -505,7 +505,7 @@
     }
   ],
   "last_summary_date": "2026-10-02",
-  "last_heartbeat": 1790931382,
+  "last_heartbeat": 1790971741,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -624,7 +624,7 @@
     "London_2026-10-02": true,
     "New York_2026-10-02": true
   },
-  "friday_notice_date": "2026-09-25",
+  "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-09-27",
   "telegram_offset": 218000788,
   "daily_trend_cache": {
