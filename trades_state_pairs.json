@@ -13,6 +13,34 @@
       "opened_at": 1790873207,
       "risk_dist": 0.005897699409692647,
       "signal_message_id": 30
+    },
+    "AUD/JPY": {
+      "symbol": "AUD/JPY",
+      "label": "AUD/JPY",
+      "direction": "sell",
+      "entry": 109.72058,
+      "sl": 109.96245546226585,
+      "tp1": 109.47870453773415,
+      "tp2": 109.2368290754683,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791155101,
+      "risk_dist": 0.24187546226585255,
+      "signal_message_id": 38
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.42538,
+      "sl": 1.4216428349326753,
+      "tp1": 1.429117165067325,
+      "tp2": 1.4328543301346495,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791155116,
+      "risk_dist": 0.003737165067324799,
+      "signal_message_id": 39
     }
   },
   "closed": [
@@ -71,8 +99,8 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-10-02",
-  "last_heartbeat": 1790966493,
+  "last_summary_date": "2026-10-04",
+  "last_heartbeat": 1791155123,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -97,7 +125,11 @@
     "Sydney_2026-10-01": true,
     "Tokyo_2026-10-01": true,
     "London_2026-10-02": true,
-    "New York_2026-10-02": true
+    "New York_2026-10-02": true,
+    "Sydney_2026-10-04": true,
+    "Tokyo_2026-10-04": true,
+    "London_2026-10-04": true,
+    "New York_2026-10-04": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-04",
@@ -105,7 +137,7 @@
   "daily_trend_cache": {
     "AUD/JPY": {
       "trend": "sell",
-      "date": "2026-09-29"
+      "date": "2026-10-04"
     },
     "GBP/USD": {
       "trend": "sell",
@@ -113,21 +145,21 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-09-30"
+      "date": "2026-10-04"
     }
   },
   "h4_trend_cache": {
     "AUD/JPY": {
-      "trend": "sell",
-      "bucket": "2026-09-29-8"
+      "trend": null,
+      "bucket": "2026-10-04-20"
     },
     "GBP/USD": {
       "trend": "sell",
       "bucket": "2026-10-01-16"
     },
     "USD/CAD": {
-      "trend": "buy",
-      "bucket": "2026-09-30-12"
+      "trend": null,
+      "bucket": "2026-10-04-20"
     }
   }
 }
