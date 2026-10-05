@@ -14,20 +14,6 @@
       "risk_dist": 0.005897699409692647,
       "signal_message_id": 30
     },
-    "AUD/JPY": {
-      "symbol": "AUD/JPY",
-      "label": "AUD/JPY",
-      "direction": "sell",
-      "entry": 109.72058,
-      "sl": 109.96245546226585,
-      "tp1": 109.47870453773415,
-      "tp2": 109.2368290754683,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791155101,
-      "risk_dist": 0.24187546226585255,
-      "signal_message_id": 38
-    },
     "USD/CAD": {
       "symbol": "USD/CAD",
       "label": "USD/CAD",
@@ -97,10 +83,19 @@
       "r": 0.75,
       "closed_at": 1790890223,
       "user_taken": null
+    },
+    {
+      "pair": "AUD/JPY",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791220001,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-05",
-  "last_heartbeat": 1791187456,
+  "last_heartbeat": 1791220016,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -130,7 +125,8 @@
     "Tokyo_2026-10-04": true,
     "London_2026-10-04": true,
     "New York_2026-10-04": true,
-    "London_2026-10-05": true
+    "London_2026-10-05": true,
+    "New York_2026-10-05": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-04",
