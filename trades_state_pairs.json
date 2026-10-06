@@ -13,6 +13,34 @@
       "opened_at": 1791279516,
       "risk_dist": 0.36696312330745684,
       "signal_message_id": 45
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "sell",
+      "entry": 1.42063,
+      "sl": 1.4241045920627826,
+      "tp1": 1.4171554079372175,
+      "tp2": 1.4136808158744347,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791320699,
+      "risk_dist": 0.0034745920627825555,
+      "signal_message_id": 48
+    },
+    "GBP/USD": {
+      "symbol": "GBP/USD",
+      "label": "GBP/USD",
+      "direction": "buy",
+      "entry": 1.32738,
+      "sl": 1.323767308879776,
+      "tp1": 1.3309926911202241,
+      "tp2": 1.3346053822404482,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791320707,
+      "risk_dist": 0.0036126911202241097,
+      "signal_message_id": 49
     }
   },
   "closed": [
@@ -134,7 +162,8 @@
     "Sydney_2026-10-05": true,
     "Tokyo_2026-10-05": true,
     "London_2026-10-06": true,
-    "New York_2026-10-06": true
+    "New York_2026-10-06": true,
+    "Sydney_2026-10-06": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-04",
@@ -145,12 +174,12 @@
       "date": "2026-10-06"
     },
     "GBP/USD": {
-      "trend": "sell",
-      "date": "2026-10-01"
+      "trend": null,
+      "date": "2026-10-06"
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-10-04"
+      "date": "2026-10-06"
     }
   },
   "h4_trend_cache": {
@@ -159,12 +188,12 @@
       "bucket": "2026-10-06-8"
     },
     "GBP/USD": {
-      "trend": "sell",
-      "bucket": "2026-10-01-16"
+      "trend": "buy",
+      "bucket": "2026-10-06-20"
     },
     "USD/CAD": {
-      "trend": null,
-      "bucket": "2026-10-04-20"
+      "trend": "sell",
+      "bucket": "2026-10-06-20"
     }
   }
 }
