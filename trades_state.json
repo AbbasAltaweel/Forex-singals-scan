@@ -13,7 +13,8 @@
       "opened_at": 1790787353,
       "risk_dist": 0.0034553130066448112,
       "signal_message_id": 462,
-      "effective_sl": 1.42215
+      "effective_sl": 1.4247414847549837,
+      "trail_hit": true
     }
   },
   "closed": [
@@ -648,7 +649,8 @@
     "London_2026-10-05": true,
     "New York_2026-10-05": true,
     "Sydney_2026-10-05": true,
-    "Tokyo_2026-10-05": true
+    "Tokyo_2026-10-05": true,
+    "London_2026-10-06": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-04",
