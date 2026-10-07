@@ -1,48 +1,5 @@
 {
-  "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "buy",
-      "entry": 1.32728,
-      "sl": 1.3230387628333073,
-      "tp1": 1.3315212371666927,
-      "tp2": 1.3357624743333856,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791305771,
-      "risk_dist": 0.0042412371666926685,
-      "signal_message_id": 487
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "sell",
-      "entry": 1.42072,
-      "sl": 1.4241945920627825,
-      "tp1": 1.4172454079372174,
-      "tp2": 1.4137708158744346,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791322362,
-      "risk_dist": 0.0034745920627825555,
-      "signal_message_id": 489
-    },
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "buy",
-      "entry": 4164.42199,
-      "sl": 4127.771118226394,
-      "tp1": 4201.072861773606,
-      "tp2": 4237.723733547211,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791322370,
-      "risk_dist": 36.65087177360601,
-      "signal_message_id": 490
-    }
-  },
+  "trades": {},
   "closed": [
     {
       "pair": "GOLD (XAU/USD)",
@@ -556,10 +513,37 @@
       "r": 0.75,
       "closed_at": 1791305786,
       "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791384017,
+      "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791384024,
+      "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791384031,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-07",
-  "last_heartbeat": 1791334922,
+  "last_heartbeat": 1791384038,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -689,7 +673,8 @@
     "New York_2026-10-06": true,
     "Sydney_2026-10-06": true,
     "Tokyo_2026-10-06": true,
-    "London_2026-10-07": true
+    "London_2026-10-07": true,
+    "New York_2026-10-07": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-04",
