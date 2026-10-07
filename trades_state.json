@@ -1,5 +1,34 @@
 {
-  "trades": {},
+  "trades": {
+    "GBP/USD": {
+      "symbol": "GBP/USD",
+      "label": "GBP/USD",
+      "direction": "sell",
+      "entry": 1.32103,
+      "sl": 1.324567075306135,
+      "tp1": 1.317492924693865,
+      "tp2": 1.3139558493877301,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791403874,
+      "risk_dist": 0.003537075306135007,
+      "signal_message_id": 495
+    },
+    "XAU/USD": {
+      "symbol": "XAU/USD",
+      "label": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "entry": 4104.72698,
+      "sl": 4144.523107826386,
+      "tp1": 4064.930852173615,
+      "tp2": 4025.1347243472296,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791403882,
+      "risk_dist": 39.7961278263856,
+      "signal_message_id": 496
+    }
+  },
   "closed": [
     {
       "pair": "GOLD (XAU/USD)",
@@ -682,29 +711,29 @@
   "daily_trend_cache": {
     "XAU/USD": {
       "trend": "sell",
-      "date": "2026-10-06"
+      "date": "2026-10-07"
     },
     "USD/CAD": {
       "trend": "buy",
       "date": "2026-10-06"
     },
     "GBP/USD": {
-      "trend": null,
-      "date": "2026-10-06"
+      "trend": "sell",
+      "date": "2026-10-07"
     }
   },
   "h4_trend_cache": {
     "XAU/USD": {
-      "trend": "buy",
-      "bucket": "2026-10-06-20"
+      "trend": "sell",
+      "bucket": "2026-10-07-20"
     },
     "USD/CAD": {
       "trend": "sell",
       "bucket": "2026-10-06-20"
     },
     "GBP/USD": {
-      "trend": "buy",
-      "bucket": "2026-10-06-16"
+      "trend": "sell",
+      "bucket": "2026-10-07-20"
     }
   }
 }
