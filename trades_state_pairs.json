@@ -27,6 +27,20 @@
       "opened_at": 1791401498,
       "risk_dist": 0.00365618515794508,
       "signal_message_id": 54
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.42552,
+      "sl": 1.4224329692681446,
+      "tp1": 1.4286070307318552,
+      "tp2": 1.4316940614637104,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1791416896,
+      "risk_dist": 0.0030870307318553447,
+      "signal_message_id": 55
     }
   },
   "closed": [
@@ -140,7 +154,7 @@
     }
   ],
   "last_summary_date": "2026-10-07",
-  "last_heartbeat": 1791380479,
+  "last_heartbeat": 1791416910,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -179,7 +193,9 @@
     "Sydney_2026-10-06": true,
     "Tokyo_2026-10-06": true,
     "London_2026-10-07": true,
-    "New York_2026-10-07": true
+    "New York_2026-10-07": true,
+    "Sydney_2026-10-07": true,
+    "Tokyo_2026-10-07": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-04",
@@ -195,7 +211,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-10-06"
+      "date": "2026-10-07"
     }
   },
   "h4_trend_cache": {
@@ -208,8 +224,8 @@
       "bucket": "2026-10-07-16"
     },
     "USD/CAD": {
-      "trend": "sell",
-      "bucket": "2026-10-06-20"
+      "trend": null,
+      "bucket": "2026-10-07-20"
     }
   }
 }
