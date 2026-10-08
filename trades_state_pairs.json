@@ -150,7 +150,7 @@
     }
   ],
   "last_summary_date": "2026-10-08",
-  "last_heartbeat": 1791456525,
+  "last_heartbeat": 1791498394,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -193,7 +193,8 @@
     "Sydney_2026-10-07": true,
     "Tokyo_2026-10-07": true,
     "London_2026-10-08": true,
-    "New York_2026-10-08": true
+    "New York_2026-10-08": true,
+    "Sydney_2026-10-08": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-04",
