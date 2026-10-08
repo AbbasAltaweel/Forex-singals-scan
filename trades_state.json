@@ -13,20 +13,6 @@
       "opened_at": 1791403874,
       "risk_dist": 0.003537075306135007,
       "signal_message_id": 495
-    },
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4104.72698,
-      "sl": 4144.523107826386,
-      "tp1": 4064.930852173615,
-      "tp2": 4025.1347243472296,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791403882,
-      "risk_dist": 39.7961278263856,
-      "signal_message_id": 496
     }
   },
   "closed": [
@@ -578,10 +564,19 @@
       "r": -1.0,
       "closed_at": 1791488638,
       "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791503948,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-08",
-  "last_heartbeat": 1791467604,
+  "last_heartbeat": 1791503955,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -716,7 +711,9 @@
     "Sydney_2026-10-07": true,
     "Tokyo_2026-10-07": true,
     "London_2026-10-08": true,
-    "New York_2026-10-08": true
+    "New York_2026-10-08": true,
+    "Sydney_2026-10-08": true,
+    "Tokyo_2026-10-08": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-04",
