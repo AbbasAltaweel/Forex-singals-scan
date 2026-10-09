@@ -13,20 +13,6 @@
       "opened_at": 1791525420,
       "risk_dist": 41.489564922950194,
       "signal_message_id": 502
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "sell",
-      "entry": 1.42142,
-      "sl": 1.4245309502979604,
-      "tp1": 1.4183090497020394,
-      "tp2": 1.415198099404079,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791525428,
-      "risk_dist": 0.003110950297960491,
-      "signal_message_id": 503
     }
   },
   "closed": [
@@ -596,10 +582,19 @@
       "r": -1.0,
       "closed_at": 1791525412,
       "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791551068,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-09",
-  "last_heartbeat": 1791503955,
+  "last_heartbeat": 1791551089,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -736,7 +731,9 @@
     "London_2026-10-08": true,
     "New York_2026-10-08": true,
     "Sydney_2026-10-08": true,
-    "Tokyo_2026-10-08": true
+    "Tokyo_2026-10-08": true,
+    "London_2026-10-09": true,
+    "New York_2026-10-09": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-04",
