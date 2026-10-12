@@ -1,20 +1,5 @@
 {
-  "trades": {
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "buy",
-      "entry": 4210.46997,
-      "sl": 4195.57220410876,
-      "tp1": 4225.36773589124,
-      "tp2": 4240.26550178248,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1791771941,
-      "risk_dist": 14.897765891239942,
-      "signal_message_id": 508
-    }
-  },
+  "trades": {},
   "closed": [
     {
       "pair": "GOLD (XAU/USD)",
@@ -600,10 +585,19 @@
       "r": -0.14,
       "closed_at": 1791759889,
       "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1791797899,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-12",
-  "last_heartbeat": 1791759910,
+  "last_heartbeat": 1791797906,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -746,7 +740,8 @@
     "Sydney_2026-10-11": true,
     "Tokyo_2026-10-11": true,
     "London_2026-10-11": true,
-    "New York_2026-10-11": true
+    "New York_2026-10-11": true,
+    "London_2026-10-12": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-11",
