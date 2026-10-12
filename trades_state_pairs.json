@@ -167,7 +167,7 @@
     }
   ],
   "last_summary_date": "2026-10-12",
-  "last_heartbeat": 1791762448,
+  "last_heartbeat": 1791801652,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -218,7 +218,8 @@
     "Sydney_2026-10-11": true,
     "Tokyo_2026-10-11": true,
     "London_2026-10-11": true,
-    "New York_2026-10-11": true
+    "New York_2026-10-11": true,
+    "London_2026-10-12": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
@@ -234,7 +235,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-10-09"
+      "date": "2026-10-12"
     }
   },
   "h4_trend_cache": {
@@ -247,8 +248,8 @@
       "bucket": "2026-10-07-16"
     },
     "USD/CAD": {
-      "trend": "sell",
-      "bucket": "2026-10-09-0"
+      "trend": null,
+      "bucket": "2026-10-12-8"
     }
   }
 }
