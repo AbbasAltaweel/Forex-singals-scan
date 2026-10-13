@@ -784,7 +784,8 @@
     "Tokyo_2026-10-12": true,
     "New York_2026-10-12": true,
     "London_2026-10-13": true,
-    "New York_2026-10-13": true
+    "New York_2026-10-13": true,
+    "Sydney_2026-10-13": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-11",
@@ -813,8 +814,8 @@
       "bucket": "2026-10-13-16"
     },
     "GBP/USD": {
-      "trend": null,
-      "bucket": "2026-10-13-0"
+      "trend": "buy",
+      "bucket": "2026-10-13-20"
     }
   }
 }
