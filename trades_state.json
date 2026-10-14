@@ -634,8 +634,8 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-10-13",
-  "last_heartbeat": 1791908511,
+  "last_summary_date": "2026-10-14",
+  "last_heartbeat": 1791937957,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -785,7 +785,8 @@
     "New York_2026-10-12": true,
     "London_2026-10-13": true,
     "New York_2026-10-13": true,
-    "Sydney_2026-10-13": true
+    "Sydney_2026-10-13": true,
+    "Tokyo_2026-10-13": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-11",
@@ -800,8 +801,8 @@
       "date": "2026-10-13"
     },
     "GBP/USD": {
-      "trend": "sell",
-      "date": "2026-10-13"
+      "trend": "buy",
+      "date": "2026-10-14"
     }
   },
   "h4_trend_cache": {
@@ -815,7 +816,7 @@
     },
     "GBP/USD": {
       "trend": "buy",
-      "bucket": "2026-10-13-20"
+      "bucket": "2026-10-14-0"
     }
   }
 }
