@@ -1,19 +1,18 @@
 {
   "trades": {
-    "AUD/JPY": {
-      "symbol": "AUD/JPY",
-      "label": "AUD/JPY",
-      "direction": "buy",
-      "entry": 110.37811,
-      "sl": 109.92404066063028,
-      "tp1": 110.83217933936973,
-      "tp2": 111.28624867873945,
-      "tp1_hit": true,
+    "GBP/USD": {
+      "symbol": "GBP/USD",
+      "label": "GBP/USD",
+      "direction": "sell",
+      "entry": 1.31904,
+      "sl": 1.3240080127978555,
+      "tp1": 1.3140719872021445,
+      "tp2": 1.3091039744042887,
+      "tp1_hit": false,
       "trade_type": "Swing",
-      "opened_at": 1791537676,
-      "risk_dist": 0.45406933936972393,
-      "signal_message_id": 63,
-      "effective_sl": 110.37811
+      "opened_at": 1792005601,
+      "risk_dist": 0.0049680127978555255,
+      "signal_message_id": 78
     }
   },
   "closed": [
@@ -169,10 +168,19 @@
       "r": -1.0,
       "closed_at": 1791990288,
       "user_taken": null
+    },
+    {
+      "pair": "AUD/JPY",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.5,
+      "closed_at": 1792005609,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-14",
-  "last_heartbeat": 1791972516,
+  "last_heartbeat": 1792005623,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -258,8 +266,8 @@
       "bucket": "2026-10-09-8"
     },
     "GBP/USD": {
-      "trend": "buy",
-      "bucket": "2026-10-14-4"
+      "trend": "sell",
+      "bucket": "2026-10-14-16"
     },
     "USD/CAD": {
       "trend": "sell",
