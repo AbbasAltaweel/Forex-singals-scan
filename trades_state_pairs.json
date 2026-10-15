@@ -22,11 +22,12 @@
       "sl": 110.38274061944256,
       "tp1": 109.25097938055745,
       "tp2": 108.6850987611149,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1792040989,
       "risk_dist": 0.5658806194425523,
-      "signal_message_id": 83
+      "signal_message_id": 83,
+      "effective_sl": 109.81686
     }
   },
   "closed": [
@@ -266,7 +267,8 @@
     "London_2026-10-14": true,
     "New York_2026-10-14": true,
     "Sydney_2026-10-14": true,
-    "Tokyo_2026-10-14": true
+    "Tokyo_2026-10-14": true,
+    "London_2026-10-15": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
