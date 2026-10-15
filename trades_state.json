@@ -8,11 +8,12 @@
       "sl": 1.4270071578747239,
       "tp1": 1.4188528421252762,
       "tp2": 1.4147756842505523,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1792017676,
       "risk_dist": 0.004077157874723847,
-      "signal_message_id": 522
+      "signal_message_id": 522,
+      "effective_sl": 1.42293
     },
     "XAU/USD": {
       "symbol": "XAU/USD",
@@ -833,7 +834,8 @@
     "Sydney_2026-10-14": true,
     "Tokyo_2026-10-14": true,
     "London_2026-10-15": true,
-    "New York_2026-10-15": true
+    "New York_2026-10-15": true,
+    "Sydney_2026-10-15": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-11",
