@@ -13,7 +13,8 @@
       "opened_at": 1792017676,
       "risk_dist": 0.004077157874723847,
       "signal_message_id": 522,
-      "effective_sl": 1.42293
+      "effective_sl": 1.419872131593957,
+      "trail_hit": true
     },
     "XAU/USD": {
       "symbol": "XAU/USD",
@@ -42,7 +43,8 @@
       "opened_at": 1792077359,
       "risk_dist": 0.005203804288096858,
       "signal_message_id": 527,
-      "effective_sl": 1.32511
+      "effective_sl": 1.3290128532160725,
+      "trail_hit": true
     }
   },
   "closed": [
@@ -837,7 +839,8 @@
     "London_2026-10-15": true,
     "New York_2026-10-15": true,
     "Sydney_2026-10-15": true,
-    "Tokyo_2026-10-15": true
+    "Tokyo_2026-10-15": true,
+    "London_2026-10-16": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-11",
