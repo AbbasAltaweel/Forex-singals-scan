@@ -27,6 +27,20 @@
       "opened_at": 1792359873,
       "risk_dist": 0.0035993064254915552,
       "signal_message_id": 537
+    },
+    "XAU/USD": {
+      "symbol": "XAU/USD",
+      "label": "GOLD (XAU/USD)",
+      "direction": "buy",
+      "entry": 4184.21684,
+      "sl": 4175.268601244263,
+      "tp1": 4193.165078755737,
+      "tp2": 4202.113317511475,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1792367012,
+      "risk_dist": 8.948238755737293,
+      "signal_message_id": 539
     }
   },
   "closed": [
@@ -853,15 +867,16 @@
     "New York_2026-10-16": true,
     "Sydney_2026-10-18": true,
     "London_2026-10-18": true,
-    "New York_2026-10-18": true
+    "New York_2026-10-18": true,
+    "Tokyo_2026-10-18": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-18",
   "telegram_offset": 218000788,
   "daily_trend_cache": {
     "XAU/USD": {
-      "trend": "sell",
-      "date": "2026-10-15"
+      "trend": "buy",
+      "date": "2026-10-18"
     },
     "USD/CAD": {
       "trend": "sell",
@@ -874,8 +889,8 @@
   },
   "h4_trend_cache": {
     "XAU/USD": {
-      "trend": null,
-      "bucket": "2026-10-15-12"
+      "trend": "buy",
+      "bucket": "2026-10-18-20"
     },
     "USD/CAD": {
       "trend": "sell",
