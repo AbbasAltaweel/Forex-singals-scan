@@ -28,7 +28,8 @@
       "opened_at": 1792169920,
       "risk_dist": 0.003985899660023717,
       "signal_message_id": 94,
-      "effective_sl": 1.41576
+      "effective_sl": 1.4127705752549822,
+      "trail_hit": true
     },
     "AUD/JPY": {
       "symbol": "AUD/JPY",
@@ -38,11 +39,12 @@
       "sl": 109.38887051489468,
       "tp1": 110.46858948510533,
       "tp2": 111.00844897021065,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1792169929,
       "risk_dist": 0.5398594851053247,
-      "signal_message_id": 95
+      "signal_message_id": 95,
+      "effective_sl": 109.92873
     }
   },
   "closed": [
@@ -310,7 +312,9 @@
     "Sydney_2026-10-18": true,
     "London_2026-10-18": true,
     "New York_2026-10-18": true,
-    "Tokyo_2026-10-18": true
+    "Tokyo_2026-10-18": true,
+    "London_2026-10-19": true,
+    "New York_2026-10-19": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
