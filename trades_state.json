@@ -1,19 +1,5 @@
 {
   "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.3313,
-      "sl": 1.335059365231038,
-      "tp1": 1.3275406347689618,
-      "tp2": 1.3237812695379236,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1792359865,
-      "risk_dist": 0.0037593652310381476,
-      "signal_message_id": 536
-    },
     "USD/CAD": {
       "symbol": "USD/CAD",
       "label": "USD/CAD",
@@ -27,7 +13,8 @@
       "opened_at": 1792359873,
       "risk_dist": 0.0035993064254915552,
       "signal_message_id": 537,
-      "effective_sl": 1.41226
+      "effective_sl": 1.4095605201808814,
+      "trail_hit": true
     },
     "XAU/USD": {
       "symbol": "XAU/USD",
@@ -719,6 +706,15 @@
       "r": -1.0,
       "closed_at": 1792421786,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1792489146,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-20",
@@ -891,7 +887,8 @@
     "London_2026-10-19": true,
     "New York_2026-10-19": true,
     "Sydney_2026-10-19": true,
-    "Tokyo_2026-10-19": true
+    "Tokyo_2026-10-19": true,
+    "London_2026-10-20": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-18",
