@@ -334,7 +334,9 @@
     "Sydney_2026-10-19": true,
     "Tokyo_2026-10-19": true,
     "London_2026-10-20": true,
-    "New York_2026-10-20": true
+    "New York_2026-10-20": true,
+    "Sydney_2026-10-20": true,
+    "Tokyo_2026-10-20": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
