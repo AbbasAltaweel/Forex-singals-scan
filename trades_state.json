@@ -13,6 +13,20 @@
       "opened_at": 1792506601,
       "risk_dist": 0.004352264547915707,
       "signal_message_id": 550
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "sell",
+      "entry": 1.40464,
+      "sl": 1.4079247423186723,
+      "tp1": 1.401355257681328,
+      "tp2": 1.3980705153626556,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1792611574,
+      "risk_dist": 0.0032847423186721514,
+      "signal_message_id": 557
     }
   },
   "closed": [
@@ -720,7 +734,7 @@
     }
   ],
   "last_summary_date": "2026-10-21",
-  "last_heartbeat": 1792577787,
+  "last_heartbeat": 1792611581,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -907,7 +921,7 @@
     },
     "USD/CAD": {
       "trend": "sell",
-      "date": "2026-10-18"
+      "date": "2026-10-21"
     },
     "GBP/USD": {
       "trend": "buy",
@@ -921,7 +935,7 @@
     },
     "USD/CAD": {
       "trend": "sell",
-      "bucket": "2026-10-18-20"
+      "bucket": "2026-10-21-16"
     },
     "GBP/USD": {
       "trend": "buy",
