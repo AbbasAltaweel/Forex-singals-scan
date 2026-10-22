@@ -13,7 +13,8 @@
       "opened_at": 1792498153,
       "risk_dist": 0.0029659881796408882,
       "signal_message_id": 104,
-      "effective_sl": 1.4051
+      "effective_sl": 1.4028755088652693,
+      "trail_hit": true
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
@@ -263,7 +264,7 @@
     }
   ],
   "last_summary_date": "2026-10-22",
-  "last_heartbeat": 1792655259,
+  "last_heartbeat": 1792692246,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
