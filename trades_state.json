@@ -1,52 +1,5 @@
 {
-  "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "buy",
-      "entry": 1.34064,
-      "sl": 1.3362877354520843,
-      "tp1": 1.3449922645479158,
-      "tp2": 1.3493445290958312,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1792506601,
-      "risk_dist": 0.004352264547915707,
-      "signal_message_id": 550
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "sell",
-      "entry": 1.40464,
-      "sl": 1.4079247423186723,
-      "tp1": 1.401355257681328,
-      "tp2": 1.3980705153626556,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1792611574,
-      "risk_dist": 0.0032847423186721514,
-      "signal_message_id": 557,
-      "effective_sl": 1.402176443260996,
-      "trail_hit": true
-    },
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "sell",
-      "entry": 4071.28245,
-      "sl": 4115.553875211091,
-      "tp1": 4027.01102478891,
-      "tp2": 3982.73959957782,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1792671443,
-      "risk_dist": 44.271425211090445,
-      "signal_message_id": 563,
-      "effective_sl": 4038.0788810916824,
-      "trail_hit": true
-    }
-  },
+  "trades": {},
   "closed": [
     {
       "pair": "GOLD (XAU/USD)",
@@ -758,10 +711,37 @@
       "r": -1.0,
       "closed_at": 1792650454,
       "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1792967211,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "time_exit",
+      "r": 1.68,
+      "closed_at": 1792967218,
+      "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1792967225,
+      "user_taken": null
     }
   ],
-  "last_summary_date": "2026-10-23",
-  "last_heartbeat": 1792765277,
+  "last_summary_date": "2026-10-25",
+  "last_heartbeat": 1792967232,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -944,7 +924,10 @@
     "Sydney_2026-10-22": true,
     "Tokyo_2026-10-22": true,
     "London_2026-10-23": true,
-    "New York_2026-10-23": true
+    "New York_2026-10-23": true,
+    "Sydney_2026-10-25": true,
+    "London_2026-10-25": true,
+    "New York_2026-10-25": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-25",
