@@ -13,6 +13,20 @@
       "opened_at": 1792992123,
       "risk_dist": 21.27632129543963,
       "signal_message_id": 574
+    },
+    "GBP/USD": {
+      "symbol": "GBP/USD",
+      "label": "GBP/USD",
+      "direction": "sell",
+      "entry": 1.33484,
+      "sl": 1.3377830547964826,
+      "tp1": 1.3318969452035174,
+      "tp2": 1.328953890407035,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1793013910,
+      "risk_dist": 0.0029430547964826026,
+      "signal_message_id": 575
     }
   },
   "closed": [
@@ -756,7 +770,7 @@
     }
   ],
   "last_summary_date": "2026-10-26",
-  "last_heartbeat": 1792967232,
+  "last_heartbeat": 1793013917,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -943,7 +957,8 @@
     "Sydney_2026-10-25": true,
     "London_2026-10-25": true,
     "New York_2026-10-25": true,
-    "Tokyo_2026-10-25": true
+    "Tokyo_2026-10-25": true,
+    "London_2026-10-26": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-25",
@@ -969,11 +984,11 @@
     },
     "USD/CAD": {
       "trend": null,
-      "bucket": "2026-10-26-0"
+      "bucket": "2026-10-26-8"
     },
     "GBP/USD": {
-      "trend": null,
-      "bucket": "2026-10-26-4"
+      "trend": "sell",
+      "bucket": "2026-10-26-8"
     }
   }
 }
