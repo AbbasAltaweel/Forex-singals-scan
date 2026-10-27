@@ -22,11 +22,12 @@
       "sl": 1.3377830547964826,
       "tp1": 1.3318969452035174,
       "tp2": 1.328953890407035,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1793013910,
       "risk_dist": 0.0029430547964826026,
-      "signal_message_id": 575
+      "signal_message_id": 575,
+      "effective_sl": 1.33484
     }
   },
   "closed": [
@@ -961,7 +962,9 @@
     "London_2026-10-26": true,
     "New York_2026-10-26": true,
     "Sydney_2026-10-26": true,
-    "Tokyo_2026-10-26": true
+    "Tokyo_2026-10-26": true,
+    "London_2026-10-27": true,
+    "New York_2026-10-27": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-25",
@@ -973,7 +976,7 @@
     },
     "USD/CAD": {
       "trend": "sell",
-      "date": "2026-10-26"
+      "date": "2026-10-27"
     },
     "GBP/USD": {
       "trend": "buy",
@@ -987,7 +990,7 @@
     },
     "USD/CAD": {
       "trend": null,
-      "bucket": "2026-10-26-8"
+      "bucket": "2026-10-27-12"
     },
     "GBP/USD": {
       "trend": "sell",
