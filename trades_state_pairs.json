@@ -1,19 +1,5 @@
 {
   "trades": {
-    "AUD/JPY": {
-      "symbol": "AUD/JPY",
-      "label": "AUD/JPY",
-      "direction": "sell",
-      "entry": 110.14459,
-      "sl": 110.80581240698686,
-      "tp1": 109.48336759301313,
-      "tp2": 108.82214518602626,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1792675034,
-      "risk_dist": 0.661222406986866,
-      "signal_message_id": 114
-    },
     "GBP/USD": {
       "symbol": "GBP/USD",
       "label": "GBP/USD",
@@ -263,10 +249,19 @@
       "r": -1.0,
       "closed_at": 1793055374,
       "user_taken": null
+    },
+    {
+      "pair": "AUD/JPY",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1793083867,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-27",
-  "last_heartbeat": 1793040951,
+  "last_heartbeat": 1793083888,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
