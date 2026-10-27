@@ -13,7 +13,8 @@
       "opened_at": 1792992123,
       "risk_dist": 21.27632129543963,
       "signal_message_id": 574,
-      "effective_sl": 4012.83237
+      "effective_sl": 4028.78961097158,
+      "trail_hit": true
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
@@ -28,7 +29,8 @@
       "opened_at": 1793013910,
       "risk_dist": 0.0029430547964826026,
       "signal_message_id": 575,
-      "effective_sl": 1.33484
+      "effective_sl": 1.3326327089026382,
+      "trail_hit": true
     },
     "USD/CAD": {
       "symbol": "USD/CAD",
@@ -979,7 +981,8 @@
     "Sydney_2026-10-26": true,
     "Tokyo_2026-10-26": true,
     "London_2026-10-27": true,
-    "New York_2026-10-27": true
+    "New York_2026-10-27": true,
+    "Sydney_2026-10-27": true
   },
   "friday_notice_date": "2026-10-02",
   "sunday_prep_date": "2026-10-25",
