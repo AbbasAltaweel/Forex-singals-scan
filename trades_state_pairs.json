@@ -8,11 +8,12 @@
       "sl": 1.3366364871869376,
       "tp1": 1.3310635128130623,
       "tp2": 1.3282770256261247,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1793065510,
       "risk_dist": 0.002786487186937636,
-      "signal_message_id": 128
+      "signal_message_id": 128,
+      "effective_sl": 1.33385
     },
     "AUD/JPY": {
       "symbol": "AUD/JPY",
@@ -27,6 +28,20 @@
       "opened_at": 1793105443,
       "risk_dist": 0.4292231932520991,
       "signal_message_id": 131
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.40519,
+      "sl": 1.4023065078987877,
+      "tp1": 1.4080734921012121,
+      "tp2": 1.4109569842024245,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1793125690,
+      "risk_dist": 0.002883492101212193,
+      "signal_message_id": 133
     }
   },
   "closed": [
@@ -275,7 +290,7 @@
     }
   ],
   "last_summary_date": "2026-10-27",
-  "last_heartbeat": 1793083888,
+  "last_heartbeat": 1793125705,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -405,8 +420,8 @@
       "bucket": "2026-10-27-0"
     },
     "USD/CAD": {
-      "trend": null,
-      "bucket": "2026-10-27-12"
+      "trend": "buy",
+      "bucket": "2026-10-27-16"
     }
   }
 }
