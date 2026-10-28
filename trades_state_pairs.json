@@ -13,7 +13,8 @@
       "opened_at": 1793065510,
       "risk_dist": 0.002786487186937636,
       "signal_message_id": 128,
-      "effective_sl": 1.33385
+      "effective_sl": 1.3317601346097967,
+      "trail_hit": true
     },
     "AUD/JPY": {
       "symbol": "AUD/JPY",
@@ -290,7 +291,7 @@
     }
   ],
   "last_summary_date": "2026-10-28",
-  "last_heartbeat": 1793125705,
+  "last_heartbeat": 1793172204,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -393,7 +394,8 @@
     "London_2026-10-27": true,
     "New York_2026-10-27": true,
     "Sydney_2026-10-27": true,
-    "Tokyo_2026-10-27": true
+    "Tokyo_2026-10-27": true,
+    "London_2026-10-28": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
