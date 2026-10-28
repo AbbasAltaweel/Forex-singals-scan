@@ -1,20 +1,5 @@
 {
-  "trades": {
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "buy",
-      "entry": 1.40496,
-      "sl": 1.4020936507559305,
-      "tp1": 1.4078263492440695,
-      "tp2": 1.4106926984881387,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1793125243,
-      "risk_dist": 0.002866349244069477,
-      "signal_message_id": 582
-    }
-  },
+  "trades": {},
   "closed": [
     {
       "pair": "GOLD (XAU/USD)",
@@ -771,10 +756,19 @@
       "r": 2.0,
       "closed_at": 1793172700,
       "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1793217201,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-28",
-  "last_heartbeat": 1793172721,
+  "last_heartbeat": 1793217222,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
