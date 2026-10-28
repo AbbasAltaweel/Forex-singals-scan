@@ -1,21 +1,5 @@
 {
   "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.33385,
-      "sl": 1.3366364871869376,
-      "tp1": 1.3310635128130623,
-      "tp2": 1.3282770256261247,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1793065510,
-      "risk_dist": 0.002786487186937636,
-      "signal_message_id": 128,
-      "effective_sl": 1.3317601346097967,
-      "trail_hit": true
-    },
     "AUD/JPY": {
       "symbol": "AUD/JPY",
       "label": "AUD/JPY",
@@ -24,25 +8,12 @@
       "sl": 110.5394968067479,
       "tp1": 111.3979431932521,
       "tp2": 111.82716638650422,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1793105443,
       "risk_dist": 0.4292231932520991,
-      "signal_message_id": 131
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "buy",
-      "entry": 1.40519,
-      "sl": 1.4023065078987877,
-      "tp1": 1.4080734921012121,
-      "tp2": 1.4109569842024245,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1793125690,
-      "risk_dist": 0.002883492101212193,
-      "signal_message_id": 133
+      "signal_message_id": 131,
+      "effective_sl": 110.96872
     }
   },
   "closed": [
@@ -288,10 +259,28 @@
       "r": -1.0,
       "closed_at": 1793083867,
       "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1793215908,
+      "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1793215916,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-10-28",
-  "last_heartbeat": 1793172204,
+  "last_heartbeat": 1793215930,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
