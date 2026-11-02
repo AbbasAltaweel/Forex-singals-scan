@@ -22,11 +22,26 @@
       "sl": 3887.7629755767684,
       "tp1": 3930.2635244232315,
       "tp2": 3951.513798846463,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1793597514,
       "risk_dist": 21.25027442323153,
-      "signal_message_id": 604
+      "signal_message_id": 604,
+      "effective_sl": 3909.01325
+    },
+    "GBP/USD": {
+      "symbol": "GBP/USD",
+      "label": "GBP/USD",
+      "direction": "buy",
+      "entry": 1.34193,
+      "sl": 1.3380214802598593,
+      "tp1": 1.3458385197401408,
+      "tp2": 1.3497470394802813,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1793627495,
+      "risk_dist": 0.003908519740140726,
+      "signal_message_id": 606
     }
   },
   "closed": [
@@ -824,7 +839,7 @@
     }
   ],
   "last_summary_date": "2026-11-02",
-  "last_heartbeat": 1793577384,
+  "last_heartbeat": 1793627502,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -1032,7 +1047,9 @@
     "New York_2026-10-30": true,
     "Sydney_2026-11-01": true,
     "London_2026-11-01": true,
-    "New York_2026-11-01": true
+    "New York_2026-11-01": true,
+    "London_2026-11-02": true,
+    "New York_2026-11-02": true
   },
   "friday_notice_date": "2026-10-30",
   "sunday_prep_date": "2026-11-01",
@@ -1047,8 +1064,8 @@
       "date": "2026-10-28"
     },
     "GBP/USD": {
-      "trend": null,
-      "date": "2026-10-29"
+      "trend": "buy",
+      "date": "2026-11-02"
     }
   },
   "h4_trend_cache": {
@@ -1061,8 +1078,8 @@
       "bucket": "2026-10-28-20"
     },
     "GBP/USD": {
-      "trend": null,
-      "bucket": "2026-10-29-4"
+      "trend": "buy",
+      "bucket": "2026-11-02-12"
     }
   }
 }
