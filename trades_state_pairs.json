@@ -315,7 +315,7 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-11-02",
+  "last_summary_date": "2026-11-03",
   "last_heartbeat": 1793644618,
   "session_notices": {
     "London_2026-09-25": true,
@@ -435,7 +435,9 @@
     "New York_2026-11-01": true,
     "Tokyo_2026-11-01": true,
     "London_2026-11-02": true,
-    "New York_2026-11-02": true
+    "New York_2026-11-02": true,
+    "Sydney_2026-11-02": true,
+    "Tokyo_2026-11-02": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
