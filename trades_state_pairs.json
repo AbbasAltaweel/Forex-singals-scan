@@ -14,22 +14,6 @@
       "risk_dist": 0.0038700180696653597,
       "signal_message_id": 140
     },
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "buy",
-      "entry": 1.33721,
-      "sl": 1.3320313957252266,
-      "tp1": 1.3423886042747735,
-      "tp2": 1.3475672085495471,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1793289821,
-      "risk_dist": 0.005178604274773457,
-      "signal_message_id": 144,
-      "effective_sl": 1.3410939532060802,
-      "trail_hit": true
-    },
     "AUD/JPY": {
       "symbol": "AUD/JPY",
       "label": "AUD/JPY",
@@ -324,10 +308,19 @@
       "r": 0.5,
       "closed_at": 1793720271,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "tp2",
+      "r": 2.0,
+      "closed_at": 1793777990,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-04",
-  "last_heartbeat": 1793740529,
+  "last_heartbeat": 1793777997,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
