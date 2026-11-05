@@ -13,6 +13,20 @@
       "opened_at": 1793861914,
       "risk_dist": 56.521643048643455,
       "signal_message_id": 618
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.40192,
+      "sl": 1.3979377500985997,
+      "tp1": 1.4059022499014004,
+      "tp2": 1.4098844998028008,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1793914289,
+      "risk_dist": 0.003982249901400392,
+      "signal_message_id": 621
     }
   },
   "closed": [
@@ -1102,8 +1116,8 @@
       "bucket": "2026-11-05-4"
     },
     "USD/CAD": {
-      "trend": "sell",
-      "bucket": "2026-11-05-4"
+      "trend": "buy",
+      "bucket": "2026-11-05-20"
     },
     "GBP/USD": {
       "trend": "buy",
