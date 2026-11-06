@@ -13,7 +13,8 @@
       "opened_at": 1793914289,
       "risk_dist": 0.003982249901400392,
       "signal_message_id": 621,
-      "effective_sl": 1.40192
+      "effective_sl": 1.4049066874260503,
+      "trail_hit": true
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
@@ -28,7 +29,22 @@
       "opened_at": 1793929748,
       "risk_dist": 0.004374901313623392,
       "signal_message_id": 622,
-      "effective_sl": 1.34501
+      "effective_sl": 1.3417288240147824,
+      "trail_hit": true
+    },
+    "XAU/USD": {
+      "symbol": "XAU/USD",
+      "label": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "entry": 4059.89824,
+      "sl": 4111.680173428642,
+      "tp1": 4008.116306571358,
+      "tp2": 3956.3343731427162,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1793983613,
+      "risk_dist": 51.78193342864188,
+      "signal_message_id": 625
     }
   },
   "closed": [
@@ -880,7 +896,7 @@
     }
   ],
   "last_summary_date": "2026-11-06",
-  "last_heartbeat": 1793929770,
+  "last_heartbeat": 1793983621,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -1105,7 +1121,8 @@
     "New York_2026-11-05": true,
     "Sydney_2026-11-05": true,
     "Tokyo_2026-11-05": true,
-    "London_2026-11-06": true
+    "London_2026-11-06": true,
+    "New York_2026-11-06": true
   },
   "friday_notice_date": "2026-10-30",
   "sunday_prep_date": "2026-11-01",
@@ -1113,7 +1130,7 @@
   "daily_trend_cache": {
     "XAU/USD": {
       "trend": "buy",
-      "date": "2026-11-05"
+      "date": "2026-11-06"
     },
     "USD/CAD": {
       "trend": "sell",
@@ -1127,7 +1144,7 @@
   "h4_trend_cache": {
     "XAU/USD": {
       "trend": "buy",
-      "bucket": "2026-11-05-4"
+      "bucket": "2026-11-06-16"
     },
     "USD/CAD": {
       "trend": "buy",
