@@ -13,38 +13,6 @@
       "opened_at": 1793917589,
       "risk_dist": 0.787152544270981,
       "signal_message_id": 169
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "buy",
-      "entry": 1.40164,
-      "sl": 1.3977407229409728,
-      "tp1": 1.4055392770590271,
-      "tp2": 1.4094385541180545,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1793917603,
-      "risk_dist": 0.003899277059027151,
-      "signal_message_id": 170,
-      "effective_sl": 1.4045644577942704,
-      "trail_hit": true
-    },
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.34475,
-      "sl": 1.3489730092152463,
-      "tp1": 1.3405269907847535,
-      "tp2": 1.336303981569507,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1793932769,
-      "risk_dist": 0.004223009215246432,
-      "signal_message_id": 172,
-      "effective_sl": 1.3415827430885652,
-      "trail_hit": true
     }
   },
   "closed": [
@@ -371,6 +339,24 @@
       "r": -1.0,
       "closed_at": 1793897469,
       "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "tp2",
+      "r": 2.0,
+      "closed_at": 1794002296,
+      "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "tp2",
+      "r": 2.0,
+      "closed_at": 1794002303,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-06",
@@ -511,7 +497,7 @@
     "London_2026-11-06": true,
     "New York_2026-11-06": true
   },
-  "friday_notice_date": null,
+  "friday_notice_date": "2026-11-06",
   "sunday_prep_date": "2026-10-11",
   "telegram_offset": 137009914,
   "daily_trend_cache": {
