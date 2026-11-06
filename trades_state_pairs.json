@@ -22,11 +22,12 @@
       "sl": 1.3977407229409728,
       "tp1": 1.4055392770590271,
       "tp2": 1.4094385541180545,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1793917603,
       "risk_dist": 0.003899277059027151,
-      "signal_message_id": 170
+      "signal_message_id": 170,
+      "effective_sl": 1.40164
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
@@ -36,11 +37,12 @@
       "sl": 1.3489730092152463,
       "tp1": 1.3405269907847535,
       "tp2": 1.336303981569507,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1793932769,
       "risk_dist": 0.004223009215246432,
-      "signal_message_id": 172
+      "signal_message_id": 172,
+      "effective_sl": 1.34475
     }
   },
   "closed": [
@@ -503,7 +505,8 @@
     "London_2026-11-05": true,
     "New York_2026-11-05": true,
     "Sydney_2026-11-05": true,
-    "Tokyo_2026-11-05": true
+    "Tokyo_2026-11-05": true,
+    "London_2026-11-06": true
   },
   "friday_notice_date": null,
   "sunday_prep_date": "2026-10-11",
