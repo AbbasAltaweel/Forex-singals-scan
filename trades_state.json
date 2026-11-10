@@ -1,33 +1,5 @@
 {
   "trades": {
-    "XAU/USD": {
-      "symbol": "XAU/USD",
-      "label": "GOLD (XAU/USD)",
-      "direction": "buy",
-      "entry": 4125.15449,
-      "sl": 4100.154895857435,
-      "tp1": 4150.154084142565,
-      "tp2": 4175.15367828513,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1794202412,
-      "risk_dist": 24.999594142565,
-      "signal_message_id": 630
-    },
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "sell",
-      "entry": 1.41008,
-      "sl": 1.4132034037034513,
-      "tp1": 1.4069565962965487,
-      "tp2": 1.4038331925930974,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1794202427,
-      "risk_dist": 0.003123403703451322,
-      "signal_message_id": 631
-    },
     "GBP/USD": {
       "symbol": "GBP/USD",
       "label": "GBP/USD",
@@ -916,10 +888,28 @@
       "r": 2.0,
       "closed_at": 1794182138,
       "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1794316743,
+      "user_taken": null
+    },
+    {
+      "pair": "GOLD (XAU/USD)",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1794316757,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-10",
-  "last_heartbeat": 1794267103,
+  "last_heartbeat": 1794316764,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -1152,7 +1142,9 @@
     "London_2026-11-09": true,
     "New York_2026-11-09": true,
     "Sydney_2026-11-09": true,
-    "Tokyo_2026-11-09": true
+    "Tokyo_2026-11-09": true,
+    "London_2026-11-10": true,
+    "New York_2026-11-10": true
   },
   "friday_notice_date": "2026-10-30",
   "sunday_prep_date": "2026-11-08",
