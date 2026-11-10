@@ -1,18 +1,32 @@
 {
   "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "buy",
-      "entry": 1.34209,
-      "sl": 1.3392051552971085,
-      "tp1": 1.3449748447028915,
-      "tp2": 1.347859689405783,
+    "XAU/USD": {
+      "symbol": "XAU/USD",
+      "label": "GOLD (XAU/USD)",
+      "direction": "sell",
+      "entry": 4035.68489,
+      "sl": 4084.9047552944685,
+      "tp1": 3986.4650247055315,
+      "tp2": 3937.245159411063,
       "tp1_hit": false,
       "trade_type": "Swing",
-      "opened_at": 1794234197,
-      "risk_dist": 0.0028848447028915203,
-      "signal_message_id": 633
+      "opened_at": 1794342804,
+      "risk_dist": 49.21986529446849,
+      "signal_message_id": 638
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.41822,
+      "sl": 1.4140077877078294,
+      "tp1": 1.4224322122921707,
+      "tp2": 1.4266444245843413,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1794342819,
+      "risk_dist": 0.004212212292170614,
+      "signal_message_id": 639
     }
   },
   "closed": [
@@ -906,6 +920,15 @@
       "r": -1.0,
       "closed_at": 1794316757,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1794342812,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-10",
@@ -1152,11 +1175,11 @@
   "daily_trend_cache": {
     "XAU/USD": {
       "trend": "buy",
-      "date": "2026-11-09"
+      "date": "2026-11-10"
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-11-09"
+      "date": "2026-11-10"
     },
     "GBP/USD": {
       "trend": null,
@@ -1165,12 +1188,12 @@
   },
   "h4_trend_cache": {
     "XAU/USD": {
-      "trend": "buy",
-      "bucket": "2026-11-09-4"
+      "trend": "sell",
+      "bucket": "2026-11-10-20"
     },
     "USD/CAD": {
-      "trend": null,
-      "bucket": "2026-11-09-4"
+      "trend": "buy",
+      "bucket": "2026-11-10-20"
     },
     "GBP/USD": {
       "trend": "buy",
