@@ -16,21 +16,19 @@
       "effective_sl": 1.421379159219128,
       "trail_hit": true
     },
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
+    "XAU/USD": {
+      "symbol": "XAU/USD",
+      "label": "GOLD (XAU/USD)",
       "direction": "sell",
-      "entry": 1.33491,
-      "sl": 1.3397535573855597,
-      "tp1": 1.3300664426144404,
-      "tp2": 1.3252228852288805,
-      "tp1_hit": true,
+      "entry": 3879.9427,
+      "sl": 3934.4663227551996,
+      "tp1": 3825.4190772448005,
+      "tp2": 3770.895454489601,
+      "tp1_hit": false,
       "trade_type": "Swing",
-      "opened_at": 1794358498,
-      "risk_dist": 0.004843557385559638,
-      "signal_message_id": 641,
-      "effective_sl": 1.3312773319608304,
-      "trail_hit": true
+      "opened_at": 1794510606,
+      "risk_dist": 54.52362275519954,
+      "signal_message_id": 647
     }
   },
   "closed": [
@@ -942,6 +940,15 @@
       "r": 1.83,
       "closed_at": 1794483746,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "tp2",
+      "r": 2.0,
+      "closed_at": 1794510592,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-12",
@@ -1187,15 +1194,16 @@
     "New York_2026-11-11": true,
     "Sydney_2026-11-11": true,
     "Tokyo_2026-11-11": true,
-    "London_2026-11-12": true
+    "London_2026-11-12": true,
+    "New York_2026-11-12": true
   },
   "friday_notice_date": "2026-10-30",
   "sunday_prep_date": "2026-11-08",
   "telegram_offset": 218000788,
   "daily_trend_cache": {
     "XAU/USD": {
-      "trend": "buy",
-      "date": "2026-11-10"
+      "trend": "sell",
+      "date": "2026-11-12"
     },
     "USD/CAD": {
       "trend": "buy",
@@ -1209,7 +1217,7 @@
   "h4_trend_cache": {
     "XAU/USD": {
       "trend": "sell",
-      "bucket": "2026-11-10-20"
+      "bucket": "2026-11-12-16"
     },
     "USD/CAD": {
       "trend": "buy",
