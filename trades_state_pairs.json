@@ -13,6 +13,34 @@
       "opened_at": 1794823048,
       "risk_dist": 0.0034091346882672013,
       "signal_message_id": 203
+    },
+    "AUD/JPY": {
+      "symbol": "AUD/JPY",
+      "label": "AUD/JPY",
+      "direction": "sell",
+      "entry": 107.45613,
+      "sl": 107.94792207218858,
+      "tp1": 106.96433792781143,
+      "tp2": 106.47254585562285,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1794883587,
+      "risk_dist": 0.49179207218857357,
+      "signal_message_id": 206
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.4314,
+      "sl": 1.4285028225283123,
+      "tp1": 1.4342971774716877,
+      "tp2": 1.4371943549433754,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1794883595,
+      "risk_dist": 0.0028971774716877174,
+      "signal_message_id": 207
     }
   },
   "closed": [
@@ -422,7 +450,7 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-11-16",
+  "last_summary_date": "2026-11-17",
   "last_heartbeat": 1794859135,
   "session_notices": {
     "London_2026-09-25": true,
@@ -586,7 +614,9 @@
     "New York_2026-11-15": true,
     "Tokyo_2026-11-15": true,
     "London_2026-11-16": true,
-    "New York_2026-11-16": true
+    "New York_2026-11-16": true,
+    "Sydney_2026-11-16": true,
+    "Tokyo_2026-11-16": true
   },
   "friday_notice_date": "2026-11-06",
   "sunday_prep_date": "2026-10-11",
@@ -594,7 +624,7 @@
   "daily_trend_cache": {
     "AUD/JPY": {
       "trend": "sell",
-      "date": "2026-11-13"
+      "date": "2026-11-17"
     },
     "GBP/USD": {
       "trend": "sell",
@@ -602,13 +632,13 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-11-16"
+      "date": "2026-11-17"
     }
   },
   "h4_trend_cache": {
     "AUD/JPY": {
       "trend": "sell",
-      "bucket": "2026-11-13-8"
+      "bucket": "2026-11-17-0"
     },
     "GBP/USD": {
       "trend": "sell",
@@ -616,7 +646,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "bucket": "2026-11-16-16"
+      "bucket": "2026-11-17-0"
     }
   }
 }
