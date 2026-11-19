@@ -23,11 +23,12 @@
       "sl": 107.94792207218858,
       "tp1": 106.96433792781143,
       "tp2": 106.47254585562285,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "trade_type": "Swing",
       "opened_at": 1794883587,
       "risk_dist": 0.49179207218857357,
-      "signal_message_id": 206
+      "signal_message_id": 206,
+      "effective_sl": 107.45613
     },
     "USD/CAD": {
       "symbol": "USD/CAD",
@@ -451,7 +452,7 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-11-18",
+  "last_summary_date": "2026-11-19",
   "last_heartbeat": 1795026619,
   "session_notices": {
     "London_2026-09-25": true,
@@ -623,7 +624,9 @@
     "Sydney_2026-11-17": true,
     "Tokyo_2026-11-17": true,
     "London_2026-11-18": true,
-    "New York_2026-11-18": true
+    "New York_2026-11-18": true,
+    "Sydney_2026-11-18": true,
+    "Tokyo_2026-11-18": true
   },
   "friday_notice_date": "2026-11-06",
   "sunday_prep_date": "2026-10-11",
