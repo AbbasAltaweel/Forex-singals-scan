@@ -13,7 +13,8 @@
       "opened_at": 1794823048,
       "risk_dist": 0.0034091346882672013,
       "signal_message_id": 203,
-      "effective_sl": 1.31884
+      "effective_sl": 1.3162831489837996,
+      "trail_hit": true
     },
     "AUD/JPY": {
       "symbol": "AUD/JPY",
@@ -28,7 +29,8 @@
       "opened_at": 1794883587,
       "risk_dist": 0.49179207218857357,
       "signal_message_id": 206,
-      "effective_sl": 107.45613
+      "effective_sl": 107.08728594585857,
+      "trail_hit": true
     },
     "USD/CAD": {
       "symbol": "USD/CAD",
@@ -453,7 +455,7 @@
     }
   ],
   "last_summary_date": "2026-11-19",
-  "last_heartbeat": 1795074915,
+  "last_heartbeat": 1795107321,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -626,7 +628,9 @@
     "London_2026-11-18": true,
     "New York_2026-11-18": true,
     "Sydney_2026-11-18": true,
-    "Tokyo_2026-11-18": true
+    "Tokyo_2026-11-18": true,
+    "London_2026-11-19": true,
+    "New York_2026-11-19": true
   },
   "friday_notice_date": "2026-11-06",
   "sunday_prep_date": "2026-10-11",
