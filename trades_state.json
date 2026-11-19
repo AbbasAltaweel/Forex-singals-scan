@@ -1,21 +1,5 @@
 {
   "trades": {
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "sell",
-      "entry": 1.32155,
-      "sl": 1.3254198024776536,
-      "tp1": 1.3176801975223464,
-      "tp2": 1.313810395044693,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1794605480,
-      "risk_dist": 0.003869802477653561,
-      "signal_message_id": 652,
-      "effective_sl": 1.3186476481417597,
-      "trail_hit": true
-    },
     "XAU/USD": {
       "symbol": "XAU/USD",
       "label": "GOLD (XAU/USD)",
@@ -29,6 +13,20 @@
       "opened_at": 1795032754,
       "risk_dist": 55.189179895851794,
       "signal_message_id": 664
+    },
+    "USD/CAD": {
+      "symbol": "USD/CAD",
+      "label": "USD/CAD",
+      "direction": "buy",
+      "entry": 1.43328,
+      "sl": 1.4296398407972142,
+      "tp1": 1.436920159202786,
+      "tp2": 1.440560318405572,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1795114788,
+      "risk_dist": 0.003640159202785931,
+      "signal_message_id": 668
     }
   },
   "closed": [
@@ -985,10 +983,19 @@
       "r": 2.0,
       "closed_at": 1795053237,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "tp2",
+      "r": 2.0,
+      "closed_at": 1795114774,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-19",
-  "last_heartbeat": 1795082515,
+  "last_heartbeat": 1795114796,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -1252,7 +1259,8 @@
     "New York_2026-11-18": true,
     "Sydney_2026-11-18": true,
     "Tokyo_2026-11-18": true,
-    "London_2026-11-19": true
+    "London_2026-11-19": true,
+    "New York_2026-11-19": true
   },
   "friday_notice_date": "2026-11-13",
   "sunday_prep_date": "2026-11-08",
@@ -1264,7 +1272,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "date": "2026-11-13"
+      "date": "2026-11-19"
     },
     "GBP/USD": {
       "trend": "sell",
@@ -1278,7 +1286,7 @@
     },
     "USD/CAD": {
       "trend": "buy",
-      "bucket": "2026-11-13-20"
+      "bucket": "2026-11-19-16"
     },
     "GBP/USD": {
       "trend": "sell",
