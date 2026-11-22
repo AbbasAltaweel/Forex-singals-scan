@@ -28,7 +28,8 @@
       "opened_at": 1795147555,
       "risk_dist": 0.7341621985803641,
       "signal_message_id": 218,
-      "effective_sl": 106.08933
+      "effective_sl": 105.53870835106473,
+      "trail_hit": true
     },
     "GBP/USD": {
       "symbol": "GBP/USD",
@@ -470,8 +471,8 @@
       "user_taken": null
     }
   ],
-  "last_summary_date": "2026-11-20",
-  "last_heartbeat": 1795207847,
+  "last_summary_date": "2026-11-22",
+  "last_heartbeat": 1795385689,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -650,7 +651,10 @@
     "Sydney_2026-11-19": true,
     "Tokyo_2026-11-19": true,
     "London_2026-11-20": true,
-    "New York_2026-11-20": true
+    "New York_2026-11-20": true,
+    "Sydney_2026-11-22": true,
+    "London_2026-11-22": true,
+    "New York_2026-11-22": true
   },
   "friday_notice_date": "2026-11-06",
   "sunday_prep_date": "2026-10-11",
