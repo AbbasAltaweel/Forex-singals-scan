@@ -350,9 +350,9 @@ def summarize(trades):
 
 
 def main():
-    token = os.environ["OANDA_API_TOKEN"]
-    tg_token = os.environ["TELEGRAM_BOT_TOKEN"]
-    tg_chat = os.environ["TELEGRAM_CHAT_ID"]
+    token = "".join(os.environ["OANDA_API_TOKEN"].split())  # strip any stray spaces/newlines from the secret
+    tg_token = os.environ["TELEGRAM_BOT_TOKEN"].strip()
+    tg_chat = os.environ["TELEGRAM_CHAT_ID"].strip()
 
     blocks, errors = [], []
     for instrument, symbol, label in PAIRS:
