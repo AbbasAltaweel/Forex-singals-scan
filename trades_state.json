@@ -27,20 +27,6 @@
       "opened_at": 1795398331,
       "risk_dist": 31.74708562125852,
       "signal_message_id": 675
-    },
-    "GBP/USD": {
-      "symbol": "GBP/USD",
-      "label": "GBP/USD",
-      "direction": "buy",
-      "entry": 1.3106,
-      "sl": 1.3076465614268546,
-      "tp1": 1.3135534385731453,
-      "tp2": 1.3165068771462907,
-      "tp1_hit": false,
-      "trade_type": "Swing",
-      "opened_at": 1795429738,
-      "risk_dist": 0.0029534385731453394,
-      "signal_message_id": 677
     }
   },
   "closed": [
@@ -1015,10 +1001,19 @@
       "r": 2.54,
       "closed_at": 1795163859,
       "user_taken": null
+    },
+    {
+      "pair": "GBP/USD",
+      "direction": "buy",
+      "trade_type": "Swing",
+      "result": "sl",
+      "r": -1.0,
+      "closed_at": 1795471908,
+      "user_taken": null
     }
   ],
   "last_summary_date": "2026-11-23",
-  "last_heartbeat": 1795429760,
+  "last_heartbeat": 1795471922,
   "session_notices": {
     "London_2026-08-27": true,
     "New York_2026-08-27": true,
@@ -1290,7 +1285,9 @@
     "Tokyo_2026-11-22": true,
     "London_2026-11-22": true,
     "New York_2026-11-22": true,
-    "London_2026-11-23": true
+    "London_2026-11-23": true,
+    "Sydney_2026-11-23": true,
+    "New York_2026-11-23": true
   },
   "friday_notice_date": "2026-11-13",
   "sunday_prep_date": "2026-11-22",
