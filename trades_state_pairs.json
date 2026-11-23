@@ -28,6 +28,20 @@
       "opened_at": 1795207840,
       "risk_dist": 0.004067075817990151,
       "signal_message_id": 221
+    },
+    "AUD/JPY": {
+      "symbol": "AUD/JPY",
+      "label": "AUD/JPY",
+      "direction": "buy",
+      "entry": 105.59809,
+      "sl": 105.12468477470253,
+      "tp1": 106.07149522529747,
+      "tp2": 106.54490045059492,
+      "tp1_hit": false,
+      "trade_type": "Swing",
+      "opened_at": 1795433303,
+      "risk_dist": 0.4734052252974692,
+      "signal_message_id": 225
     }
   },
   "closed": [
@@ -465,7 +479,7 @@
     }
   ],
   "last_summary_date": "2026-11-23",
-  "last_heartbeat": 1795385689,
+  "last_heartbeat": 1795433317,
   "session_notices": {
     "London_2026-09-25": true,
     "New York_2026-09-25": true,
@@ -648,7 +662,8 @@
     "Sydney_2026-11-22": true,
     "London_2026-11-22": true,
     "New York_2026-11-22": true,
-    "Tokyo_2026-11-22": true
+    "Tokyo_2026-11-22": true,
+    "London_2026-11-23": true
   },
   "friday_notice_date": "2026-11-06",
   "sunday_prep_date": "2026-10-11",
@@ -656,7 +671,7 @@
   "daily_trend_cache": {
     "AUD/JPY": {
       "trend": "sell",
-      "date": "2026-11-20"
+      "date": "2026-11-23"
     },
     "GBP/USD": {
       "trend": "sell",
@@ -669,8 +684,8 @@
   },
   "h4_trend_cache": {
     "AUD/JPY": {
-      "trend": "sell",
-      "bucket": "2026-11-20-4"
+      "trend": "buy",
+      "bucket": "2026-11-23-8"
     },
     "GBP/USD": {
       "trend": "sell",
