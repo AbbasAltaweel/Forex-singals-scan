@@ -282,11 +282,18 @@ def fetch_history(instrument, token, granularity):
     cursor = start
     while cursor < now:
         params = {"granularity": granularity, "price": "M", "count": 5000,
-                  "from": to_rfc3339(cursor)}
-        r = requests.get(f"{OANDA_HOST}/v3/instruments/{instrument}/candles",
-                         headers=headers, params=params, timeout=60)
+                  "from": f"{cursor:.0f}"}
+        r = None
+        for attempt in range(4):
+            r = requests.get(f"{OANDA_HOST}/v3/instruments/{instrument}/candles",
+                             headers=headers, params=params, timeout=60)
+            if r.status_code == 200 or r.status_code < 500 and r.status_code != 429:
+                break
+            time.sleep(3 * (attempt + 1))   # 5xx / rate limit: wait and retry
         if r.status_code != 200:
-            raise RuntimeError(f"HTTP {r.status_code}: {r.text[:200]}")
+            body = re.sub(r"<[^>]+>", " ", r.text)
+            body = " ".join(body.split())[:100]
+            raise RuntimeError(f"HTTP {r.status_code} {body}")
         candles = r.json().get("candles", [])
         new = [c for c in candles if c.get("complete") and parse_time(c["time"]) > (times[-1] if times else 0)]
         if not candles:
