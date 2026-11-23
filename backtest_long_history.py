@@ -26,6 +26,8 @@ import os
 import sys
 import time
 import datetime
+import html
+import re
 import requests
 
 PAIRS = [
@@ -308,9 +310,14 @@ def fetch_history(instrument, token, granularity):
 
 def send_telegram(token, chat_id, text):
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    r = requests.post(url, data={"chat_id": chat_id, "text": text[:4090], "parse_mode": "HTML"}, timeout=20)
+    text = text[:4000]
+    r = requests.post(url, data={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}, timeout=20)
     if r.status_code != 200:
-        print(f"Telegram send failed: {r.status_code} {r.text}", file=sys.stderr)
+        print(f"Telegram HTML send failed: {r.status_code} {r.text}", file=sys.stderr)
+        plain = html.unescape(re.sub(r"<[^>]+>", "", text))
+        r2 = requests.post(url, data={"chat_id": chat_id, "text": plain}, timeout=20)
+        if r2.status_code != 200:
+            print(f"Telegram plain send failed: {r2.status_code} {r2.text}", file=sys.stderr)
 
 
 def run_simulation(symbol, d):
@@ -373,8 +380,8 @@ def main():
                     lines.append(f"     by year R: {years}")
                 print(f"{label} {gran}: {text}")
             except Exception as e:
-                errors.append(f"{label} {gran}: {e}")
-                lines.append(f"  {gran}: failed ({str(e)[:80]})")
+                errors.append(f"{label} {gran}: {html.escape(str(e)[:200])}")
+                lines.append(f"  {gran}: failed ({html.escape(str(e)[:120])})")
         blocks.append("\n".join(lines))
 
     header_msg = (f"<b>Long-History Backtest ({HISTORY_YEARS}y, OANDA)</b>\n"
