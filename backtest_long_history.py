@@ -252,6 +252,25 @@ def profit_factor(trades):
     return gains / losses
 
 
+def parse_time(value):
+    """OANDA times come back as RFC3339 text ('2021-11-23T14:00:00.000000000Z')
+    or UNIX seconds depending on settings. Accept both -> UNIX seconds (float)."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        pass
+    txt = str(value).rstrip("Z")
+    if "." in txt:
+        base, frac = txt.split(".", 1)
+        txt = base + "." + frac[:6]
+    fmt = "%Y-%m-%dT%H:%M:%S.%f" if "." in txt else "%Y-%m-%dT%H:%M:%S"
+    return datetime.datetime.strptime(txt, fmt).replace(tzinfo=datetime.timezone.utc).timestamp()
+
+
+def to_rfc3339(ts):
+    return datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000000000Z")
+
+
 def fetch_history(instrument, token, granularity):
     """Paginated OANDA candle download, oldest -> newest, complete candles only."""
     headers = {"Authorization": f"Bearer {token}"}
@@ -261,21 +280,21 @@ def fetch_history(instrument, token, granularity):
     cursor = start
     while cursor < now:
         params = {"granularity": granularity, "price": "M", "count": 5000,
-                  "from": f"{cursor:.0f}", "dateTimeFormat": "UNIX"}
+                  "from": to_rfc3339(cursor)}
         r = requests.get(f"{OANDA_HOST}/v3/instruments/{instrument}/candles",
                          headers=headers, params=params, timeout=60)
         if r.status_code != 200:
             raise RuntimeError(f"HTTP {r.status_code}: {r.text[:200]}")
         candles = r.json().get("candles", [])
-        new = [c for c in candles if c.get("complete") and float(c["time"]) > (times[-1] if times else 0)]
+        new = [c for c in candles if c.get("complete") and parse_time(c["time"]) > (times[-1] if times else 0)]
         if not candles:
             break
         for c in new:
-            times.append(float(c["time"]))
+            times.append(parse_time(c["time"]))
             highs.append(float(c["mid"]["h"]))
             lows.append(float(c["mid"]["l"]))
             closes.append(float(c["mid"]["c"]))
-        last_time = float(candles[-1]["time"])
+        last_time = parse_time(candles[-1]["time"])
         if last_time <= cursor:
             break
         cursor = last_time + 1
@@ -355,7 +374,7 @@ def main():
                 print(f"{label} {gran}: {text}")
             except Exception as e:
                 errors.append(f"{label} {gran}: {e}")
-                lines.append(f"  {gran}: failed")
+                lines.append(f"  {gran}: failed ({str(e)[:80]})")
         blocks.append("\n".join(lines))
 
     header_msg = (f"<b>Long-History Backtest ({HISTORY_YEARS}y, OANDA)</b>\n"
