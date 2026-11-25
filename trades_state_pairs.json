@@ -1,21 +1,5 @@
 {
   "trades": {
-    "USD/CAD": {
-      "symbol": "USD/CAD",
-      "label": "USD/CAD",
-      "direction": "sell",
-      "entry": 1.42757,
-      "sl": 1.4318779045350307,
-      "tp1": 1.4232620954649693,
-      "tp2": 1.4189541909299384,
-      "tp1_hit": true,
-      "trade_type": "Swing",
-      "opened_at": 1795544285,
-      "risk_dist": 0.0043079045350307155,
-      "signal_message_id": 239,
-      "effective_sl": 1.424339071598727,
-      "trail_hit": true
-    },
     "GBP/USD": {
       "symbol": "GBP/USD",
       "label": "GBP/USD",
@@ -489,6 +473,15 @@
       "result": "sl",
       "r": -1.0,
       "closed_at": 1795606977,
+      "user_taken": null
+    },
+    {
+      "pair": "USD/CAD",
+      "direction": "sell",
+      "trade_type": "Swing",
+      "result": "breakeven",
+      "r": 0.75,
+      "closed_at": 1795639183,
       "user_taken": null
     }
   ],
