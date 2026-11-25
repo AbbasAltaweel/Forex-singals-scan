@@ -52,6 +52,32 @@ PAIRS = [
 
 STATE_FILE = "trades_state_pairs.json"
 REQUEST_GAP_SECONDS = 7
+
+# ---- Position sizing (message only; never blocks a signal) ----
+ACCOUNT_BALANCE = 1000.0   # <-- change to your account size (USD)
+RISK_PCT = 1.0             # % of the account risked per trade
+
+
+def size_line(symbol, price, risk_dist):
+    """Suggested position size so a stop-out loses about RISK_PCT of the account."""
+    try:
+        risk_usd = ACCOUNT_BALANCE * RISK_PCT / 100.0
+        if not risk_dist or risk_dist <= 0:
+            return ""
+        if symbol == "XAU/USD":
+            lots = (risk_usd / risk_dist) / 100.0          # 1 lot = 100 oz
+        elif symbol.endswith("/USD"):
+            lots = (risk_usd / risk_dist) / 100000.0       # quote currency is USD
+        elif symbol == "USD/CAD":
+            lots = (risk_usd * price / risk_dist) / 100000.0
+        else:
+            return (f"Risk per trade: <b>{RISK_PCT:g}%</b> (about ${risk_usd:.0f}). "
+                    f"Use your broker's lot calculator with the SL above.\n")
+        return (f"Size for {RISK_PCT:g}% risk (about ${risk_usd:.0f} on ${ACCOUNT_BALANCE:,.0f}): "
+                f"<b>{lots:.2f} lots</b>\n")
+    except Exception:
+        return ""
+
 ATR_STOP_MULTIPLIER = 1.5
 RR_TP1 = 1.0
 RR_TP2 = 2.0
@@ -571,7 +597,7 @@ def _gold_deadline_passed(opened_at_ts):
     return now_local() >= deadline_dt
 
 
-def check_open_trade(trade, highs, lows, closes, d):
+def _check_open_trade_candle(trade, highs, lows, closes, d):
     last_high, last_low = highs[-1], lows[-1]
     direction = trade["direction"]
     entry, sl, tp1, tp2 = trade["entry"], trade["sl"], trade["tp1"], trade["tp2"]
@@ -654,6 +680,39 @@ def check_open_trade(trade, highs, lows, closes, d):
             r_val = 0.75 if trade.get("trail_hit") else R_BREAKEVEN_AFTER_TP1
             return msg, trade, False, ("breakeven", r_val)
         return None, trade, True, None
+
+
+def check_open_trade(trade, highs, lows, closes, d):
+    """Replays every hourly candle since the trade opened (not just the latest one),
+    so a target or stop touched earlier -- during a delayed or missed scan -- is still
+    caught, in order. Messages for events found on the way (e.g. TP1 then TP2) are joined.
+    Uses floor(age/1h)+1 candles; the candle holding the entry moment is only included
+    when the trade is already over an hour old."""
+    n_total = len(closes)
+    age = max(0, int(time.time()) - int(trade.get("opened_at", int(time.time()))))
+    n = max(1, min(n_total, age // 3600 + 1))
+    real_opened_at = trade.get("opened_at")
+    msgs = []
+    try:
+        for k in range(n_total - n, n_total):
+            last = (k == n_total - 1)
+            if not last:
+                trade["opened_at"] = int(time.time())   # keep the time-exit for the final candle only
+            elif real_opened_at is not None:
+                trade["opened_at"] = real_opened_at
+            for _ in range(4):     # one candle can trigger several steps (TP1, trail, TP2)
+                msg, trade, still_open, result = _check_open_trade_candle(
+                    trade, highs[:k + 1], lows[:k + 1], closes[:k + 1], d)
+                if msg:
+                    msgs.append(msg)
+                if not still_open or not msg:
+                    break
+            if not still_open:
+                break
+    finally:
+        if real_opened_at is not None:
+            trade["opened_at"] = real_opened_at
+    return ("\n\n".join(msgs) if msgs else None), trade, still_open, result
 
 
 def build_summary(closed_trades):
@@ -883,6 +942,7 @@ def main():
                             f"TP1: <code>{p['tp1']:.{d}f}</code>  (1R)\n"
                             f"TP2: <code>{p['tp2']:.{d}f}</code>  (2R)\n"
                             f"Risk:Reward  1 : 2\n"
+                            f"{size_line(symbol, p['entry'], trade['risk_dist'])}"
                             f"<i>Full agreement: {' · '.join(sig['notes'])}</i>\n\n"
                             f"{risk_block}"
                             f"<i>If price has already moved more than ~{buffer_pips:.{d}f} away from entry by the time you act, "
